@@ -9162,6 +9162,7 @@ function saveToStorage(){
       planCodeOverrides,
       planNameOverrides,
       planPrereqOverrides,
+      courses,
       savedAt: new Date().toISOString()
     };
     localStorage.setItem(DB_KEY, JSON.stringify(state));
@@ -9209,7 +9210,15 @@ function applyPortalState(state, enrolledMapOverride){
   }
   seedDefaultProgramManagerAccounts();
 
-  // Restore enrolled counts on courses
+  // Restore the full course catalog if this saved/synced copy has one (older
+  // saves and any copy still missing this field fall back to the code-defined
+  // catalog below, so this stays backward compatible).
+  if(Array.isArray(state.courses) && state.courses.length){
+    courses.length=0;
+    state.courses.forEach(c=>courses.push(c));
+  }
+  // Restore enrolled counts on courses (belt-and-braces for older saves that
+  // only ever captured counts, not full course records).
   const enrolledMap=enrolledMapOverride||JSON.parse(localStorage.getItem(COURSES_KEY)||'{}');
   courses.forEach(c=>{ if(enrolledMap[c.id]!==undefined) c.enrolled=enrolledMap[c.id]; });
   return true;
@@ -9403,12 +9412,14 @@ function exportData(){
   if(!isAdminUser()){toast('Only Admin can export full portal data.','err');return;}
   try{
     const state={
-      students, enrollments, examResults,
+      students, registrationExcelRecords, enrollments, examResults, assessmentConfigs,
       teachers, sessions, studyPlans, seriesPlanTags, adminOverrides, accounts, auditLog, academicOffering, semesterPOSOfferingConfig, planCodeOverrides, planNameOverrides, planPrereqOverrides,
+      courses,
       exportedAt: new Date().toISOString(),
       version: 'dsu_portal_v1'
     };
-    // Also include course enrolled counts
+    // Also include course enrolled counts (kept alongside the full course
+    // catalog above for backward compatibility with older imports)
     const enrolledMap={};
     courses.forEach(c=>{ enrolledMap[c.id]=c.enrolled; });
     state.enrolledMap=enrolledMap;
@@ -9453,8 +9464,10 @@ function importData(input){
 
       // Restore arrays
       students.length=0;     (state.students||[]).forEach(x=>students.push(x));
+      registrationExcelRecords.length=0; (state.registrationExcelRecords||[]).forEach(x=>registrationExcelRecords.push(x));
       enrollments.length=0;  state.enrollments.forEach(x=>enrollments.push(x));
       examResults.length=0;  state.examResults.forEach(x=>examResults.push(x));
+      assessmentConfigs.length=0; (state.assessmentConfigs||[]).forEach(x=>assessmentConfigs.push(x));
       teachers.length=0;     (state.teachers||[]).filter(x=>!/^TCH\d+$/.test(String(x.id||''))).forEach(x=>teachers.push(x));
       sessions.length=0;     (state.sessions||[]).filter(x=>!/^SES00[1-4]$/.test(String(x.id||''))).forEach(x=>sessions.push(x));
       studyPlans.length=0;   (state.studyPlans||[]).forEach(x=>studyPlans.push(x));
@@ -9473,6 +9486,12 @@ function importData(input){
        migrateStudentPlanVersionTags();
        syncSeriesPlanTagsToStudents();
 
+      // Restore the full course catalog if this backup has one (older
+      // backups only carried enrolled counts, handled below for those).
+      if(Array.isArray(state.courses) && state.courses.length){
+        courses.length=0;
+        state.courses.forEach(c=>courses.push(c));
+      }
       // Restore enrolled counts on courses
       if(state.enrolledMap){
         courses.forEach(c=>{

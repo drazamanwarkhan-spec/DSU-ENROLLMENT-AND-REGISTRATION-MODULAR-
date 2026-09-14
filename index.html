@@ -143,6 +143,12 @@ nav{
 .student-result-main{min-width:0;flex:1;}
 .student-result-name{font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .student-result-meta{font-size:11px;color:var(--tx3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.student-result-stats{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px;}
+.student-result-stat{font-size:10px;line-height:1.2;padding:3px 6px;border-radius:5px;background:rgba(255,255,255,.045);border:1px solid var(--bdr);color:var(--tx2);white-space:nowrap;}
+.student-result-stat strong{color:var(--tx);font-weight:700;}
+.student-result-stat.cgpa strong{color:var(--amber3);}
+.student-result-stat.sgpa strong{color:#7ecbb8;}
+.student-result-stat.alert strong{color:#ffb0a7;}
 .student-result-arrow{color:var(--tx3);font-size:16px;}
 .student-search-empty{padding:28px;text-align:center;color:var(--tx3);border:1px dashed var(--bdr);border-radius:10px;grid-column:1/-1;}
 @media(max-width:800px){.program-cards,.student-results{grid-template-columns:1fr;}.student-search-box{max-width:none;min-width:0;width:100%;}}
@@ -2935,11 +2941,12 @@ function applyIntegratedPSRNStudents(){
       relegationCount:Number(r.relegationCount||0),
       probationHistory:[],
       currentTerm:r.currentTerm,
-      registeredOn:'Spring 2026 PSRN'
+      registeredOn:'Spring 2026 PSRN',
+      resultSource:'PSRN'
     };
     students.push(obj);
     r.currentTermResults.forEach(rr=>{
-      examResults.push({studentId:r.id,courseId:rr.courseId,grade:rr.grade,gp:gpMap[rr.grade]??0,status:rr.status,date:'Spring 2026 PSRN'});
+      examResults.push({studentId:r.id,courseId:rr.courseId,grade:rr.grade,gp:gpMap[rr.grade]??0,status:rr.status,date:'Spring 2026 PSRN',source:'PSRN'});
     });
   });
   studyPlans.push(...buildIntegratedStudyPlans());
@@ -3068,33 +3075,87 @@ function getSGPA(sid){
 }
 
 // ── Automatic SGPA / CGPA ──
-// Local posted results are authoritative once available. CGPA is credit
-// weighted over all passed courses; SGPA is credit weighted for the active
-// academic session. Legacy imported CGPA/current-term results are used only
-// when no local result has yet been posted.
-function _latestPassedResultsForStudent(sid){
-  const latest={};
-  examResults.filter(r=>String(r.studentId)===String(sid)).forEach(r=>{latest[String(r.courseId)]=r;});
-  return Object.values(latest).filter(r=>r.status==='pass');
+// PSRN supplies an authoritative cumulative CGPA. The seeded PSRN rows are
+// also copied into examResults for transcripts, but they must not be treated
+// as newly posted local marks or they will replace the supplied CGPA with an
+// incomplete calculation based only on the current term.
+const PSRN_GRADE_POINTS={
+  'A+':4,'A':4,'A-':3.67,'B+':3.33,'B':3,'B-':2.67,
+  'C+':2.33,'C':2,'C-':1.67,'D+':1.33,'D':1,'F':0
+};
+function isPSRNResult(r){
+  return String(r?.source||'').toUpperCase()==='PSRN'||String(r?.date||'')==='Spring 2026 PSRN';
 }
-function _resultCredits(cid){const c=courses.find(x=>String(x.id)===String(cid));return Number(c?.credits)||3;}
+function psrnGradePoint(r){
+  const grade=String(r?.grade||'').trim().toUpperCase();
+  return Object.prototype.hasOwnProperty.call(PSRN_GRADE_POINTS,grade)
+    ? PSRN_GRADE_POINTS[grade]
+    : Number(r?.gp||0);
+}
+function planCreditsForCourse(cid){
+  const wanted=String(cid||'').toUpperCase();
+  let credits=null;
+  Object.values(NC_PLAN_DATA||{}).forEach(versions=>Object.values(versions||{}).forEach(sems=>Object.values(sems||{}).forEach(items=>(items||[]).forEach(item=>{
+    if(credits===null&&String(item.code||'').toUpperCase()===wanted)credits=Number(item.ch)||null;
+  }))));
+  if(credits===null)Object.values(NC_ELECTIVE_DATA||{}).forEach(items=>(items||[]).forEach(item=>{
+    if(credits===null&&String(item.code||'').toUpperCase()===wanted)credits=Number(item.ch)||null;
+  }));
+  return credits;
+}
+function _resultCredits(cid,preferPlan=false){
+  const planCredits=planCreditsForCourse(cid);
+  if(preferPlan&&planCredits!==null)return planCredits;
+  const c=courses.find(x=>String(x.id).toUpperCase()===String(cid||'').toUpperCase());
+  return Number(c?.credits)||planCredits||3;
+}
+function weightedPSRNGPA(results){
+  let qp=0,cr=0;
+  (results||[]).forEach(r=>{
+    const credits=_resultCredits(r.courseId,true);
+    qp+=credits*psrnGradePoint(r);
+    cr+=credits;
+  });
+  return cr?(qp/cr).toFixed(2):'N/A';
+}
+function hasLocalResults(sid){
+  return examResults.some(r=>String(r.studentId)===String(sid)&&!isPSRNResult(r));
+}
+function _latestResultsForStudent(sid){
+  const latest={};
+  examResults.filter(r=>String(r.studentId)===String(sid)).forEach(r=>{latest[String(r.courseId).toUpperCase()]=r;});
+  return Object.values(latest);
+}
 function _autoCGPA(sid){
-  const passed=_latestPassedResultsForStudent(sid);
-  if(passed.length){
-    let qp=0,cr=0; passed.forEach(r=>{const c=_resultCredits(r.courseId);qp+=c*Number(r.gp||0);cr+=c;});
+  const st=students.find(x=>String(x.id)===String(sid));
+  // Keep the cumulative PSRN value until an actual local result is posted.
+  if(st&&Number.isFinite(Number(st.reportedCGPA))&&!hasLocalResults(sid)){
+    return Number(st.reportedCGPA).toFixed(2);
+  }
+  const results=_latestResultsForStudent(sid);
+  if(results.length){
+    let qp=0,cr=0;
+    results.forEach(r=>{
+      const credits=_resultCredits(r.courseId,isPSRNResult(r));
+      qp+=credits*(isPSRNResult(r)?psrnGradePoint(r):Number(r.gp||0));
+      cr+=credits;
+    });
     return cr?(qp/cr).toFixed(2):'N/A';
   }
-  const st=students.find(x=>String(x.id)===String(sid));
   return st&&Number.isFinite(Number(st.reportedCGPA))?Number(st.reportedCGPA).toFixed(2):'N/A';
 }
 function _autoSGPA(sid){
+  const st=students.find(x=>String(x.id)===String(sid));
+  // PSRN term results include failed courses and use the plan's exact credit
+  // hours. This gives BBA251066: (1×1 + 0×3 + 2×2 + 3.33×3) / 9 = 1.67.
+  if(st&&Array.isArray(st.currentTermResults)&&st.currentTermResults.length&&!hasLocalResults(sid)){
+    return weightedPSRNGPA(st.currentTermResults);
+  }
   const term=String(currentSessionLabel()||'').trim();
   const local=examResults.filter(r=>String(r.studentId)===String(sid)&&(String(r.term||'').trim()===term || (!r.term && (academicOffering||[]).some(o=>String(o.courseCode||o.id)===String(r.courseId)&&String(o.term||'')===term))));
   const latest={};local.forEach(r=>{latest[String(r.courseId)]=r;});
-  const passed=Object.values(latest).filter(r=>r.status==='pass');
-  if(passed.length){let qp=0,cr=0;passed.forEach(r=>{const c=_resultCredits(r.courseId);qp+=c*Number(r.gp||0);cr+=c;});return cr?(qp/cr).toFixed(2):'N/A';}
-  const st=students.find(x=>String(x.id)===String(sid));
-  if(st&&Array.isArray(st.currentTermResults)&&st.currentTermResults.length){let qp=0,cr=0;st.currentTermResults.forEach(r=>{if(r.status==='pass'){const c=_resultCredits(r.courseId);qp+=c*Number(r.gp||0);cr+=c;}});return cr?(qp/cr).toFixed(2):'N/A';}
+  const localResults=Object.values(latest);
+  if(localResults.length)return weightedPSRNGPA(localResults);
   return 'N/A';
 }
 // Override the legacy accessors with automatic calculations.
@@ -3446,11 +3507,20 @@ function renderHomeStudents(){
     const nm=`${s.firstName||''} ${s.lastName||''}`.trim()||s.id;
     const initials=nm.split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase();
     const remark=s.academicRemark&&s.academicRemark!=='Good Standing'?` · ${s.academicRemark}`:'';
+    const standing=getProbationSummary(s);
+    const cgpa=getGPA(s.id);
+    const sgpa=getSGPA(s.id);
     return `<div class="student-result" onclick="viewStu('${s.id}')">
       <div class="student-result-av">${initials}</div>
       <div class="student-result-main">
         <div class="student-result-name">${nm}</div>
         <div class="student-result-meta">${s.id} · ${s.program||'—'} · Series ${s.series||'—'}${remark}</div>
+        <div class="student-result-stats">
+          <span class="student-result-stat cgpa">CGPA <strong>${cgpa}</strong></span>
+          <span class="student-result-stat sgpa">SGPA <strong>${sgpa}</strong></span>
+          <span class="student-result-stat ${standing.probation?'alert':''}">Probation <strong>${standing.probation}</strong></span>
+          <span class="student-result-stat ${standing.relegation?'alert':''}">Relegation <strong>${standing.relegation}</strong></span>
+        </div>
       </div>
       <div class="student-result-arrow">→</div>
     </div>`;
@@ -4148,6 +4218,18 @@ function editStudentReg(sid){
 }
 
 function updateNavAv(s){
+  // Selecting an active student is a working-context change, not a login
+  // change. Admins, program managers, and faculty must keep their own
+  // identity in the navigation while they inspect or manage a student.
+  if(currentUser&&currentUser.role!=='student'){
+    const navLabel=currentUser.role==='program_manager'
+      ? `${currentUser.name||currentUser.id} · ${currentUser.program||''}`
+      : (currentUser.name||currentUser.id||'');
+    document.getElementById('navAv').textContent=(currentUser.name||currentUser.id||'').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('navName').textContent=navLabel;
+    return;
+  }
+  if(!s)return;
   document.getElementById('navAv').textContent=studentInitials(s);
   document.getElementById('navName').textContent=s.firstName+' '+s.lastName;
 }
@@ -5475,12 +5557,12 @@ function otrAttempts(s){
   (examResults||[]).filter(r=>String(r.studentId)===String(s.id)).forEach(r=>{
     const cid=String(r.courseId||'').toUpperCase();
     posted.add(cid);
-    out.push({term:norm(r.term),courseId:cid,grade:r.grade||'—',gp:Number(r.gp||0),status:r.status});
+    out.push({term:norm(r.term),courseId:cid,grade:r.grade||'—',gp:isPSRNResult(r)?psrnGradePoint(r):Number(r.gp||0),status:r.status});
   });
   if(Array.isArray(s.currentTermResults)){
     s.currentTermResults.forEach(r=>{
       const cid=String(r.courseId||'').toUpperCase();
-      if(!posted.has(cid))out.push({term:fallbackTerm,courseId:cid,grade:r.grade||'—',gp:Number(r.gp||0),status:r.status});
+      if(!posted.has(cid))out.push({term:fallbackTerm,courseId:cid,grade:r.grade||'—',gp:psrnGradePoint(r),status:r.status});
     });
   }
   return out.sort((a,b)=>otrTermKey(a.term)-otrTermKey(b.term));
@@ -6037,7 +6119,9 @@ function setStu(sid){
   activeId=sid;
   const s=students.find(x=>x.id===sid);
   if(s)updateNavAv(s);
-  toast('Active student: '+sid,'ok');
+  toast((currentUser&&currentUser.role==='student')
+    ? 'Active student: '+sid
+    : 'Student selected for management: '+sid,'ok');
   renderPortal();
 }
 
@@ -10129,7 +10213,8 @@ function autoGenerateCredentials(){
 }
 
 // Restore embedded PSRN roster entries that are missing from an older or
-// partially saved localStorage snapshot. Existing records are never replaced.
+// partially saved localStorage snapshot. Academic values from PSRN remain
+// authoritative, while user-maintained contact/admission fields are kept.
 function restoreMissingPreloadedStudents(){
   if(!Array.isArray(INTEGRATED_PSRN_STUDENTS)||!INTEGRATED_PSRN_STUDENTS.length)return 0;
   const gpMap={'A+':4,'A':4,'A-':3.7,'B+':3.3,'B':3,'B-':2.7,'C+':2.3,'C':2,'C-':1.7,'D+':1.3,'D':1,'F':0};
@@ -10146,14 +10231,26 @@ function restoreMissingPreloadedStudents(){
         address:'',completedCourses:[...(r.completedCourses||[])],failedCourses:[...(r.failedCourses||[])],
         currentTermResults:[...(r.currentTermResults||[])],reportedCGPA:Number(r.reportedCGPA||0),
         academicRemark:r.academicRemark||'',probationCount:Number(r.probationCount||0),relegationCount:Number(r.relegationCount||0),
-        probationHistory:[],currentTerm:r.currentTerm||'Spring 2026',registeredOn:'Spring 2026 PSRN'
+        probationHistory:[],currentTerm:r.currentTerm||'Spring 2026',registeredOn:'Spring 2026 PSRN',resultSource:'PSRN'
       };
       students.push(s); added++;
+    }else if(s.registeredOn==='Spring 2026 PSRN'||s.resultSource==='PSRN'){
+      Object.assign(s,{
+        reportedCGPA:Number(r.reportedCGPA||0),
+        academicRemark:r.academicRemark||'',
+        probationCount:Number(r.probationCount||0),
+        relegationCount:Number(r.relegationCount||0),
+        currentTerm:r.currentTerm||s.currentTerm||'Spring 2026',
+        currentTermResults:[...(r.currentTermResults||[])],
+        completedCourses:[...(r.completedCourses||[])],
+        failedCourses:[...(r.failedCourses||[])],
+        resultSource:'PSRN'
+      });
     }
     // Restore only missing embedded result records; never overwrite edited results.
     (r.currentTermResults||[]).forEach(rr=>{
       const exists=examResults.some(x=>String(x.studentId)===sid&&String(x.courseId)===String(rr.courseId)&&String(x.date||'')==='Spring 2026 PSRN');
-      if(!exists){examResults.push({studentId:sid,courseId:rr.courseId,grade:rr.grade,gp:gpMap[rr.grade]??Number(rr.gp||0),status:rr.status,date:'Spring 2026 PSRN'});resultsAdded++;}
+      if(!exists){examResults.push({studentId:sid,courseId:rr.courseId,grade:rr.grade,gp:gpMap[rr.grade]??Number(rr.gp||0),status:rr.status,date:'Spring 2026 PSRN',source:'PSRN'});resultsAdded++;}
     });
   });
   if(!activeId&&students.length)activeId=students[0].id;

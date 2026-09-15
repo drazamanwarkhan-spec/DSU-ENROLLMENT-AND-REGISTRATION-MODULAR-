@@ -462,7 +462,7 @@ textarea{resize:vertical;min-height:80px;}
 }
 @media(max-width:480px){
   .stats-row{grid-template-columns:1fr;}
-  .role-tabs{grid-template-columns:1fr 1fr 1fr;}
+  .role-tabs{grid-template-columns:repeat(5,1fr);}
   .hero h1{font-size:24px;}
   .hero-ctas .btn{width:100%;justify-content:center;}
   .demo-pills{gap:5px;}
@@ -495,13 +495,17 @@ textarea{resize:vertical;min-height:80px;}
 #at-offering .offering-table th:nth-child(11){width:5%;}
 #at-offering .offering-table th:nth-child(12){width:4%;}
 #at-offering .offering-table th:nth-child(13){width:5%;}
-#at-offering .offering-table th:nth-child(14){width:5%;}
+#at-offering .offering-table th:nth-child(14){width:8%;}
+#at-offering .offering-table th:nth-child(15){width:5%;}
 #at-offering .offering-actions{display:flex;gap:3px;align-items:center;justify-content:center;white-space:nowrap;}
 #at-offering .offering-icon-btn{width:27px;height:27px;padding:0;justify-content:center;font-size:13px;line-height:1;flex:0 0 27px;}
 #at-offering .offering-actions .btn-xs{border-radius:6px;}
 @media(max-width:980px){#at-offering .offering-table{min-width:1050px;}}
 @media(max-width:720px){#at-offering .form-shell{padding:14px 12px;}}
 /* ── LOGIN SCREEN ── */
+.dsu-savebar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:40;margin:0 0 16px;padding:10px 12px;background:var(--ink2);border:1px solid var(--bdr2);border-radius:10px;box-shadow:var(--shadow);}
+.dsu-savebar-note{font-size:11px;color:var(--tx3);}
+@media print{.dsu-savebar{display:none!important;}}
 #loginScreen{
   position:fixed;inset:0;z-index:9999;
   background:var(--ink);
@@ -523,7 +527,7 @@ textarea{resize:vertical;min-height:80px;}
 .login-logo-name{font-family:var(--fh);font-size:26px;font-weight:700;color:var(--tx);}
 .login-logo-sub{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-top:3px;}
 .login-logo-seal{width:62px;height:62px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-family:var(--fh);font-size:24px;font-weight:700;color:var(--ink);border:3px solid rgba(200,132,42,.35);}
-.role-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:28px;}
+.role-tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:28px;}
 .role-tab{padding:11px 6px;border-radius:9px;border:1px solid var(--bdr2);background:none;color:var(--tx2);font-family:var(--fb);font-size:12px;cursor:pointer;transition:all .15s;text-align:center;user-select:none;-webkit-user-select:none;}
 .role-tab:hover{background:var(--ink3);color:var(--tx);}
 .role-tab.active{background:rgba(200,132,42,.12);color:var(--amber2);border-color:rgba(200,132,42,.3);}
@@ -540,11 +544,13 @@ textarea{resize:vertical;min-height:80px;}
 .demo-pill{font-size:10px;padding:3px 10px;border-radius:99px;background:var(--ink3);color:var(--tx2);border:1px solid var(--bdr);cursor:pointer;transition:all .12s;}
 .demo-pill:hover{border-color:var(--amber);color:var(--amber2);}
 /* ── ROLE-BASED NAV ── */
-.nav-student,.nav-teacher,.nav-admin,.nav-manager{display:none;}
+.nav-student,.nav-teacher,.nav-admin,.nav-manager,.nav-dean,.nav-controller{display:none;}
 body.role-student .nav-student{display:inline-flex;}
 body.role-teacher .nav-teacher{display:inline-flex;}
 body.role-admin .nav-admin{display:inline-flex;}
 body.role-program_manager .nav-manager{display:inline-flex;}
+body.role-dean .nav-dean{display:inline-flex;}
+body.role-controller .nav-controller{display:inline-flex;}
 body.role-program_manager .nav-manager-restricted{display:none;}
 .nav-admin-data{display:none;}
 body.role-admin .nav-admin-data{display:inline-flex;}
@@ -580,6 +586,18 @@ body.role-admin .nav-cloud-sync,body.role-program_manager .nav-cloud-sync{displa
 body.theme-light .cal-popup{background:#fff;}
 body.theme-light .cal-trigger-btn{background:#f9f9f9;}
 </style>
+
+<style id="dsu-result-enhancements-css">
+.result-special-select{min-width:112px;padding:6px 8px;font-size:11px;border-radius:6px;}
+.sessional-breakdown{display:grid;grid-template-columns:repeat(4,minmax(88px,1fr));gap:5px;min-width:370px;}
+.sessional-breakdown .sb-item{display:flex;flex-direction:column;gap:3px;}
+.sessional-breakdown .sb-item label{font-size:8px;letter-spacing:.04em;text-transform:none;color:var(--tx3);}
+.sessional-breakdown .sb-item input{width:100%;padding:6px 7px;font-size:11px;}
+.result-detail-box{margin-top:12px;padding:12px;border:1px solid var(--bdr);border-radius:9px;background:rgba(255,255,255,.018);}
+.result-detail-box strong{color:var(--tx);}
+.grade-special{font-weight:800;letter-spacing:.03em;}
+@media(max-width:720px){.sessional-breakdown{grid-template-columns:repeat(2,minmax(88px,1fr));min-width:190px;}}
+</style>
 </head>
 <body>
 <datalist id="calYearOptionsList"></datalist>
@@ -593,20 +611,26 @@ body.theme-light .cal-trigger-btn{background:#f9f9f9;}
       <div class="login-logo-sub">Enrollment Portal · Secure Login</div>
     </div>
     <div class="role-tabs" id="loginRoleTabs">
-      <div class="role-tab" onclick="selectLoginRole('student',this)">
+      <div class="role-tab active" onclick="selectLoginRole('student',this)">
         <span class="role-icon">🎓</span>Student
       </div>
       <div class="role-tab" onclick="selectLoginRole('teacher',this)">
         <span class="role-icon">👨‍🏫</span>Faculty
       </div>
-      <div class="role-tab active" onclick="selectLoginRole('admin',this)">
+      <div class="role-tab" onclick="selectLoginRole('admin',this)">
         <span class="role-icon">⚙️</span>Admin
+      </div>
+      <div class="role-tab" onclick="selectLoginRole('dean',this)">
+        <span class="role-icon">🎓</span>Dean
+      </div>
+      <div class="role-tab" onclick="selectLoginRole('controller',this)">
+        <span class="role-icon">📋</span>Controller
       </div>
     </div>
     <div class="login-err" id="loginErr">Invalid credentials. Please try again.</div>
     <div class="login-field">
-      <label id="loginIdLabel">Login ID</label>
-      <input type="text" id="loginId" placeholder="Enter login ID" autocomplete="username"/>
+      <label id="loginIdLabel">Student ID</label>
+      <input type="text" id="loginId" placeholder="Enter student ID" autocomplete="username"/>
     </div>
     <div class="login-field">
       <label>Password</label>
@@ -614,7 +638,7 @@ body.theme-light .cal-trigger-btn{background:#f9f9f9;}
     </div>
     <div class="login-btn" onclick="doLogin()">Sign In →</div>
     <div class="login-hint" id="loginHintText">
-      Select a tab above. Current authorized portal access is configured with the admin credentials you requested.
+      Use the Student ID and password created for you in Admin → Accounts.
     </div>
   </div>
 </div>
@@ -639,6 +663,10 @@ body.theme-light .cal-trigger-btn{background:#f9f9f9;}
     <!-- Teacher only -->
     <button class="ntab nav-teacher" onclick="goPage('teacher-dash',this)">My Dashboard</button>
     <button class="ntab nav-teacher" onclick="goPage('teacher-results',this)">Enter Results</button>
+    <button class="ntab nav-teacher" onclick="goPage('teacher-report',this)">📊 Submission Report</button>
+    <button class="ntab nav-teacher" onclick="goPage('teacher-review-report',this)">🔍 Review Status</button>
+    <button class="ntab nav-teacher" onclick="goPage('teacher-exam-report',this)">🏁 Exam Result Report</button>
+    <button class="ntab nav-teacher" onclick="goPage('teacher-grade-report',this)">🎯 Grade Distribution</button>
     <!-- Admin only -->
     <button class="ntab nav-admin" onclick="goPage('sessions',this)">Sessions</button>
     <button class="ntab nav-admin" onclick="goPage('enroll',this)">Student Enrollment</button>
@@ -1106,6 +1134,13 @@ body.theme-light .cal-trigger-btn{background:#f9f9f9;}
       <button class="i-tab active" onclick="showATab('students',this)">Students</button>
       <button class="i-tab" onclick="showATab('enrollments',this)">Enrollments</button>
       <button class="i-tab" onclick="showATab('results',this)">Enter Results</button>
+      <button class="i-tab" id="approvalsTabBtn" onclick="showATab('approvals',this)">✅ HOD Result Approval</button>
+      <button class="i-tab" id="deanApprovalsTabBtn" onclick="showATab('dean-approvals',this)">🎓 Dean Approval</button>
+      <button class="i-tab" id="controllerApprovalsTabBtn" onclick="showATab('controller-approvals',this)">📋 Controller of Examination</button>
+      <button class="i-tab" onclick="showATab('submission-report',this)">📊 Result Submission Report</button>
+      <button class="i-tab" onclick="showATab('faculty-review-report',this)">🔍 Faculty Review Report</button>
+      <button class="i-tab" onclick="showATab('exam-result-report',this)">🏁 Exam Result Report</button>
+      <button class="i-tab" onclick="showATab('grade-distribution',this)">🎯 Grade Distribution Report</button>
       <button class="i-tab" onclick="showATab('overrides',this)">Overrides</button>
       <button class="i-tab" onclick="showATab('plans',this)">Plans of Study</button>
       <button class="i-tab" onclick="showATab('courses',this)">Manage Courses</button>
@@ -1203,6 +1238,14 @@ body.theme-light .cal-trigger-btn{background:#f9f9f9;}
         </table></div>
       </div>
     </div>
+
+    <div id="at-approvals" style="display:none;"></div>
+    <div id="at-dean-approvals" style="display:none;"></div>
+    <div id="at-controller-approvals" style="display:none;"></div>
+    <div id="at-submission-report" style="display:none;"></div>
+    <div id="at-faculty-review-report" style="display:none;"></div>
+    <div id="at-exam-result-report" style="display:none;"></div>
+    <div id="at-grade-distribution" style="display:none;"></div>
 
     <div id="at-overrides" style="display:none;">
       <div class="sec-hdr">
@@ -1414,7 +1457,7 @@ body.theme-light .cal-trigger-btn{background:#f9f9f9;}
       </div>
 
       <div class="tbl-wrap"><table class="offering-table">
-        <thead><tr><th>Term</th><th>Program</th><th>Sem</th><th>Section</th><th>Code</th><th>Course</th><th>Expected Students</th><th>POS Source</th><th>Faculty</th><th>Type</th><th>Mode</th><th>Hrs/Wk</th><th>Capacity</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Term</th><th>Program</th><th>Sem</th><th>Section</th><th>Code</th><th>Course</th><th>Expected Students</th><th>POS Source</th><th>Faculty</th><th>Type</th><th>Mode</th><th>Hrs/Wk</th><th>Capacity</th><th>Result Status</th><th>Actions</th></tr></thead>
         <tbody id="aoff-body"></tbody>
       </table></div>
     </div>
@@ -1629,7 +1672,7 @@ body.theme-light .cal-trigger-btn{background:#f9f9f9;}
           <option value="student">Student</option>
           <option value="teacher">Faculty</option>
           <option value="admin">Admin</option>
-          <option value="program_manager">Program Manager</option>
+          <option value="program_manager">Program Manager / HOD</option><option value="dean">Dean</option><option value="controller">Controller of Examination</option>
         </select>
       </div>
       <div class="tbl-wrap"><table>
@@ -1643,6 +1686,10 @@ body.theme-light .cal-trigger-btn{background:#f9f9f9;}
 
 <!-- ══════════════ TEACHER RESULTS ══════════════ -->
 <div class="page" id="page-teacher-results"></div>
+<div class="page" id="page-teacher-report"></div>
+<div class="page" id="page-teacher-review-report"></div>
+<div class="page" id="page-teacher-exam-report"></div>
+<div class="page" id="page-teacher-grade-report"></div>
 
 </div><!-- #appRoot -->
 
@@ -1660,7 +1707,9 @@ body.theme-light .cal-trigger-btn{background:#f9f9f9;}
           <select id="acc-role" onchange="onAccRoleChange()">
             <option value="student">🎓 Student</option>
             <option value="teacher">👨‍🏫 Faculty</option>
-            <option value="program_manager">🏢 Program Manager</option>
+            <option value="program_manager">🏢 Program Manager / HOD</option>
+            <option value="dean">🎓 Dean</option>
+            <option value="controller">📋 Controller of Examination</option>
             <option value="admin">⚙️ Admin Staff</option>
           </select>
         </div>
@@ -2230,7 +2279,7 @@ function savePlanCodes(program,version){
   }));
   planCodeEditState[program+'|'+version]=false;
   installNCPlanCourses();
-  saveToStorage(); updateSaveBadge();
+   saveToStorage(); updateSaveBadge();
   renderProgram(programKeyForCodeEdit(program));
   renderCourses(); renderAdminCrs();
   toast(changed?`${changed} Plan of Study course${changed===1?'':'s'} updated/added.`:'No Plan of Study changes were made.','ok');
@@ -2537,6 +2586,10 @@ function currentSessionDateLabel(){
 // ══════════════════════════════════════
 function isAdminUser(){return !!(currentUser&&currentUser.role==='admin');}
 function isProgramManager(){return !!(currentUser&&currentUser.role==='program_manager');}
+function isDean(){return !!(currentUser&&currentUser.role==='dean');}
+function isController(){return !!(currentUser&&currentUser.role==='controller');}
+function isResultWorkflowRole(){return isAdminUser()||isProgramManager()||isDean()||isController();}
+function canOpenAdminPage(){return isResultWorkflowRole();}
 function managerProgram(){return isProgramManager()?(normalizeProgramKey(currentUser.program)||String(currentUser.program||'').trim()):'';}
 function isManagerAllowedProgram(program){return ['BBA','BS-AF','BS-BAP'].includes(normalizeProgramKey(program));}
 // Per-account extra-tab permissions for Program Managers. "Program Admin"
@@ -2635,14 +2688,14 @@ function getStudentFailedCourseIds(sid){
   const s=students.find(x=>x.id===sid);if(!s)return new Set();
   const ids=new Set((s.failedCourses||[]).map(x=>String(x).toUpperCase()));
   examResults.filter(r=>r.studentId===sid&&r.status==='fail').forEach(r=>ids.add(String(r.courseId).toUpperCase()));
-  return ids;
+  return expandWithCodeAliases(ids);
 }
 function getStudentCompletedCourseIds(sid){
   const s=students.find(x=>x.id===sid);if(!s)return new Set();
   const ids=new Set((s.completedCourses||[]).map(x=>String(x).toUpperCase()));
   examResults.filter(r=>r.studentId===sid&&r.status==='pass').forEach(r=>ids.add(String(r.courseId).toUpperCase()));
   enrollments.filter(e=>e.studentId===sid&&e.status==='completed').forEach(e=>ids.add(String(e.courseId).toUpperCase()));
-  return ids;
+  return expandWithCodeAliases(ids);
 }
 
 // ── Performance: memoize the per-student lookups above ─────────────────────
@@ -2871,6 +2924,24 @@ function getStudentEnrollmentCourses(sid){
 }
 function isCourseEligibleForStudent(sid,cid){return getStudentEnrollmentCourses(sid).some(c=>String(c.id).toUpperCase()===String(cid||'').toUpperCase());}
 
+// True only if the given course code has actually been added to the Academic
+// Offering (📚 Academic Offering tab) for this program — either as a direct
+// course row, or as an Elective/Specialisation slot row where this course was
+// picked as the selected elective. Auto Enroll (single or bulk) must only ever
+// place a student into a course that a staff member has actually offered;
+// otherwise a course sitting in the Plan of Study but never opened for the
+// term would still get auto enrolled, which is not a real offered class.
+function isCourseInAcademicOffering(program,courseCode){
+  const p=normalizeProgramKey(program)||String(program||'').trim();
+  const code=String(courseCode||'').trim().toUpperCase();
+  if(!p||!code)return false;
+  return academicOffering.some(o=>{
+    if((normalizeProgramKey(o.program)||String(o.program||'').trim())!==p)return false;
+    const rowCode=o.isElectiveSlot?String(o.selectedElectiveCode||''):String(o.courseCode||'');
+    return rowCode.trim().toUpperCase()===code;
+  });
+}
+
 function buildIntegratedStudyPlans(){
   const out=[];
   Object.entries(NC_PLAN_DATA).forEach(([program,versions])=>{
@@ -2893,7 +2964,72 @@ function buildIntegratedStudyPlans(){
   // POS-2021 is now loaded from the supplied BBA/BS-AF roadmaps above; no 2023 fallback is used for those programs.
   return out;
 }
+// ── Cross-program course-code collision fix ─────────────────────────────
+// A handful of Plan-of-Study course codes are reused across programs for
+// genuinely DIFFERENT subjects (mostly affecting BS-BAP, whose analytics
+// courses happen to reuse "MS-3xxx" numbers that BBA/BS-AF also use for
+// unrelated courses). Because the course catalogue keeps only one
+// title/credit record per code, this silently made BS-BAP students'
+// Auto Enroll (and their catalogue/result records) show the OTHER
+// program's course instead of their own. This list is a manually vetted
+// set of TRUE collisions (materially different subjects) — ordinary
+// shared Gen-Ed/core courses (Islamic Studies, Pakistan Studies,
+// Principles of Management, etc.) are untouched, as are same-program
+// elective/specialization slots that intentionally reuse one code.
+const NC_TRUE_CODE_COLLISIONS=[
+  {code:'MS-1302',program:'BS-BAP',match:/programming\s*fundamentals/i,tag:'BAP'},
+  {code:'MS-1401',program:'BS-BAP',match:/object\s*oriented/i,tag:'BAP'},
+  {code:'MS-2103',program:'BS-BAP',match:/legal.*ethical/i,tag:'BAP'},
+  {code:'MS-2103',program:'BS-BAP',match:/fundamentals\s*of\s*business\s*analytics/i,tag:'BAP2'},
+  {code:'MS-3103',program:'BS-BAP',match:/fundamentals\s*of\s*business\s*analytics/i,tag:'BAP'},
+  {code:'MS-3104',program:'BS-BAP',match:/legal.*ethical/i,tag:'BAP'},
+  {code:'MS-3218',program:'BS-BAP',match:/fraud/i,tag:'BAP'},
+  {code:'MS-3401',program:'BS-BAP',match:/business\s*economics/i,tag:'BAP'},
+  {code:'MS-3602',program:'BS-BAP',match:/capstone|research\s*method/i,tag:'BAP'},
+  {code:'MS-4115',program:'BS-BAP',match:/decision\s*scien/i,tag:'BAP'},
+  {code:'MS-4236',program:'BS-BAP',match:/econometrics/i,tag:'BAP'}
+];
+// old (shared) code -> [new disambiguated code(s)] and back, so a student's
+// EXISTING completed/failed history recorded under the old shared code still
+// satisfies the (now correctly split-out) requirement. Populated by
+// disambiguateCollidingPlanCodes(); never mutated afterwards.
+let NC_CODE_ALIASES={};
+function _addCodeAlias(a,b){
+  (NC_CODE_ALIASES[a]=NC_CODE_ALIASES[a]||[]).push(b);
+  (NC_CODE_ALIASES[b]=NC_CODE_ALIASES[b]||[]).push(a);
+}
+let _planCodesDisambiguated=false;
+function disambiguateCollidingPlanCodes(){
+  if(_planCodesDisambiguated)return;
+  _planCodesDisambiguated=true;
+  Object.entries(NC_PLAN_DATA).forEach(([program,versions])=>{
+    Object.values(versions).forEach(sems=>{
+      Object.values(sems).forEach(items=>{
+        items.forEach(item=>{
+          const raw=String(item.code||'').trim();
+          if(!raw||raw.includes('/'))return;
+          const code=raw.toUpperCase();
+          const hit=NC_TRUE_CODE_COLLISIONS.find(x=>x.code===code&&x.program===program&&x.match.test(String(item.name||'')));
+          if(!hit)return;
+          const newCode=`${hit.code}-${hit.tag}`;
+          if(item.code!==newCode){
+            item.code=newCode;
+            _addCodeAlias(hit.code,newCode);
+          }
+        });
+      });
+    });
+  });
+}
+// Expand a Set of uppercase course IDs with any known collision aliases, so a
+// completed/failed record filed under the OLD shared code still counts
+// towards the NEW disambiguated requirement, and vice versa.
+function expandWithCodeAliases(ids){
+  [...ids].forEach(id=>{(NC_CODE_ALIASES[id]||[]).forEach(a=>ids.add(a));});
+  return ids;
+}
 function installNCPlanCourses(){
+  disambiguateCollidingPlanCodes();
   const byCode=new Map();
   Object.entries(NC_PLAN_DATA).forEach(([program,versions])=>Object.values(versions).forEach(sems=>Object.values(sems).forEach(items=>items.forEach(c=>{
     ncConcreteCodes(c.code).forEach(code=>{
@@ -2982,7 +3118,7 @@ let semesterPOSOfferingConfig={};
 let editingOfferingId=null;
 function currentActorInfo(){
   if(!currentUser)return{role:'system',roleLabel:'System',id:'system',name:'System'};
-  const roleLabelMap={student:'Student',teacher:'Faculty',admin:'Admin',program_manager:'Program Manager'};
+  const roleLabelMap={student:'Student',teacher:'Faculty',admin:'Admin',program_manager:'Program Manager / HOD',dean:'Dean',controller:'Controller of Examination'};
   return{
     role:currentUser.role||'unknown',
     roleLabel:roleLabelMap[currentUser.role]||currentUser.role,
@@ -3182,7 +3318,7 @@ const DEPT_TAG={
 // NAV
 // ══════════════════════════════════════
 function goPage(name,btn){
-  if((name==='admin'||name==='enroll'||name==='sessions'||name==='teachers') && !(currentUser&&(currentUser.role==='admin'||currentUser.role==='program_manager'))){toast('Access denied.','err');return;}
+  if((name==='admin'||name==='enroll'||name==='sessions'||name==='teachers') && !canOpenAdminPage()){toast('Access denied.','err');return;}
   if(isProgramManager() && ['sessions','enroll','teachers'].includes(name) && !managerTabAllowed(name)){toast("You don't have access to this tab. Ask an Admin to enable it for your account.",'err');return;}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
@@ -3197,6 +3333,10 @@ function goPage(name,btn){
     teachers:renderTeachers,
     programs:()=>renderProgram('bba'),
     admin:initAdminPage,
+    'teacher-report':renderTeacherSubmissionReport,
+    'teacher-review-report':renderTeacherFacultyReviewReport,
+    'teacher-exam-report':renderTeacherExamResultReport,
+    'teacher-grade-report':renderTeacherGradeDistributionReport,
     enroll:()=>{
       populateStuSel();
       populateRegCC();
@@ -3215,51 +3355,36 @@ function goPage(name,btn){
 }
 
 function initAdminPage(){
-  const manager=isProgramManager();
-  const accTab=document.querySelector("#page-admin .i-tab[onclick*='accounts']");
-  if(accTab)accTab.style.display=manager?'none':'';
-  const accPanel=document.getElementById('at-accounts');if(accPanel&&manager)accPanel.style.display='none';
+  const manager=isProgramManager(), dean=isDean(), controller=isController();
   const adminTabBar=document.querySelector('#page-admin > .page-inner > .i-tabs');
-  const managerTabs=new Set(['students','plans','offering']);
+  const managerTabs=new Set(['students','plans','offering','approvals']);
+  const deanTabs=new Set(['dean-approvals']);
+  const controllerTabs=new Set(['controller-approvals']);
   if(adminTabBar){
     adminTabBar.querySelectorAll('.i-tab').forEach(tab=>{
       const match=String(tab.getAttribute('onclick')||'').match(/showATab\('([^']+)'/);
-      tab.style.display=manager&&match&&!managerTabs.has(match[1])?'none':'';
+      let visible=true;
+      if(manager)visible=!!(match&&managerTabs.has(match[1]));
+      else if(dean)visible=!!(match&&deanTabs.has(match[1]));
+      else if(controller)visible=!!(match&&controllerTabs.has(match[1]));
+      tab.style.display=visible?'':'none';
     });
   }
-  if(manager){
-    ['byc-program','offFilterProgram','offPosProgram','offGenProgram'].forEach(id=>{
-      const el=document.getElementById(id);
-      if(el){
-        el.value=managerProgram();
-        el.disabled=true;
-      }
-    });
-  }else{
-    ['byc-program','offFilterProgram','offPosProgram','offGenProgram'].forEach(id=>{
-      const el=document.getElementById(id);
-      if(el)el.disabled=false;
-    });
+  ['byc-program','offFilterProgram','offPosProgram','offGenProgram'].forEach(id=>{
+    const el=document.getElementById(id);if(el){el.value=manager?managerProgram():'';el.disabled=manager;}
+  });
+  ['students','enrollments','results','approvals','dean-approvals','controller-approvals','submission-report','faculty-review-report','exam-result-report','grade-distribution','overrides','plans','courses','offering','imports','accounts','log'].forEach(x=>{const el=document.getElementById('at-'+x);if(el)el.style.display='none';});
+  const defaultTab=manager?'approvals':(dean?'dean-approvals':(controller?'controller-approvals':'students'));
+  const target=document.getElementById('at-'+defaultTab);if(target)target.style.display='';
+  document.querySelectorAll('#page-admin .i-tab').forEach(b=>b.classList.remove('active'));
+  const defaultBtn=document.querySelector(`#page-admin .i-tab[onclick*=\"showATab('${defaultTab}'\"]`);if(defaultBtn)defaultBtn.classList.add('active');
+  if(manager||dean||controller){
+    if(defaultTab==='approvals')renderResultApproval();
+    if(defaultTab==='dean-approvals')renderDeanApproval();
+    if(defaultTab==='controller-approvals')renderControllerApproval();
+    return;
   }
-  // Reset to Students tab as active
-  ['students','enrollments','results','overrides','plans','courses','offering','imports','accounts','log'].forEach(x=>{
-    const el=document.getElementById('at-'+x);
-    if(el)el.style.display='none';
-  });
-  const stuEl=document.getElementById('at-students');
-  if(stuEl)stuEl.style.display='';
-  // Reset tab button states
-  document.querySelectorAll('#page-admin .i-tab').forEach((b,i)=>{
-    b.classList.toggle('active',i===0);
-  });
-  // Render all data
-  renderAdminStu();
-  renderAdminEnr();
-  renderStudentEnrollmentTab();
-  renderAdminCrs();
-  renderAdminPlans();
-  populateResStuSel();
-  initOverridesTab();
+  renderAdminStu();renderAdminEnr();renderStudentEnrollmentTab();renderAdminCrs();updateApprovalBadge();renderAdminPlans();populateResStuSel();initOverridesTab();
 }
 
 // ══════════════════════════════════════
@@ -3279,36 +3404,24 @@ function showETab(t,btn){
 
 }
 function showATab(t,btn){
-  if(isProgramManager()&&!['students','plans','offering'].includes(t)){toast('Program Managers can access only their Students, Plans of Study and Academic Offering.','err');return;}
-  ['students','enrollments','results','overrides','plans','courses','offering','imports','accounts','log'].forEach(x=>{
-    const el=document.getElementById('at-'+x);
-    if(el)el.style.display='none';
-  });
-  const target=document.getElementById('at-'+t);
-  if(target)target.style.display='';
-  document.querySelectorAll('#page-admin .i-tab').forEach(b=>b.classList.remove('active'));
-  if(btn)btn.classList.add('active');
-  if(t==='students'){
-    const bar=document.querySelector('#at-students > .i-tabs');
-    if(bar)bar.querySelectorAll('.i-tab').forEach((b,i)=>b.classList.toggle('active',i===0));
-    const all=document.getElementById('astu-view-all'), byc=document.getElementById('astu-view-bycourse');
-    if(all)all.style.display=''; if(byc)byc.style.display='none';
-    const trx=document.getElementById('astu-view-transcript'); if(trx)trx.style.display='none';
-    renderAdminStu();
-  }
+  if(isProgramManager()&&!['students','plans','offering','approvals'].includes(t)){toast('Program Managers can access only their Students, Plans of Study, Academic Offering and HOD Result Approval.','err');return;}
+  if(isDean()&&t!=='dean-approvals'){toast('Dean access is limited to the separate Dean Approval tab.','err');return;}
+  if(isController()&&t!=='controller-approvals'){toast('Controller access is limited to the separate Controller of Examination tab.','err');return;}
+  ['students','enrollments','results','approvals','dean-approvals','controller-approvals','submission-report','faculty-review-report','exam-result-report','grade-distribution','overrides','plans','courses','offering','imports','accounts','log'].forEach(x=>{const el=document.getElementById('at-'+x);if(el)el.style.display='none';});
+  const target=document.getElementById('at-'+t);if(target)target.style.display='';
+  document.querySelectorAll('#page-admin .i-tab').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');
+  if(t==='students'){renderAdminStu();}
   if(t==='enrollments')renderAdminEnr();
   if(t==='results')renderExamResultsManager('');
+  if(t==='approvals')renderResultApproval();
+  if(t==='dean-approvals')renderDeanApproval();
+  if(t==='controller-approvals')renderControllerApproval();
+  if(t==='submission-report')renderSubmissionReport();
+  if(t==='faculty-review-report')renderFacultyReviewReport();
+  if(t==='exam-result-report')renderExamResultReport();
+  if(t==='grade-distribution')renderGradeDistributionReport();
   if(t==='overrides')initOverridesTab();
-  if(t==='log'){
-    currentLogView='all';
-    const logTabs=document.querySelector('#at-log .i-tabs');
-    if(logTabs){
-      logTabs.querySelectorAll('.i-tab').forEach((b,i)=>b.classList.toggle('active',i===0));
-    }
-    const actorSel=document.getElementById('log-actor-filter');
-    if(actorSel){actorSel.disabled=false;actorSel.value='';}
-    renderActivityLog();
-  }
+  if(t==='log')renderActivityLog();
   if(t==='plans')renderAdminPlans();
   if(t==='courses')renderAdminCrs();
   if(t==='offering')renderAdminOffering();
@@ -3329,16 +3442,20 @@ function showPTab(t,btn){
 // ══════════════════════════════════════
 function hasCompleted(sid,cid){
   const s=students.find(x=>x.id===sid);if(!s)return false;
+  // A disambiguated collision code (see NC_CODE_ALIASES) also matches a
+  // historical record filed under the old shared code, and vice versa.
+  const candidates=[String(cid).toUpperCase(),...(NC_CODE_ALIASES[String(cid).toUpperCase()]||[])];
+  const matches=v=>candidates.includes(String(v).toUpperCase());
   // Check transfer credits
-  if(s.completedCourses&&s.completedCourses.includes(cid))return true;
+  if((s.completedCourses||[]).some(matches))return true;
   // Check if passed via exam result (latest result for this course)
-  const results=examResults.filter(r=>r.studentId===sid&&r.courseId===cid);
+  const results=examResults.filter(r=>r.studentId===sid&&matches(r.courseId));
   if(results.length){
     // Must have at least one pass result AND the most recent must not be a fail
     return results.some(r=>r.status==='pass');
   }
   // Fallback: completed status in enrollments
-  return enrollments.some(e=>e.studentId===sid&&e.courseId===cid&&e.status==='completed');
+  return enrollments.some(e=>e.studentId===sid&&matches(e.courseId)&&e.status==='completed');
 }
 function checkPrereqs(sid,cid){
   const c=courses.find(x=>x.id===cid);if(!c)return false;
@@ -3942,7 +4059,7 @@ function doRegister(){
     s.probationHistory=Array.isArray(s.probationHistory)?s.probationHistory:[];
     toast(`${first} ${last} updated.`,'ok');
     clearReg();
-    saveToStorage();updateSaveBadge();
+     saveToStorage({urgentCloud:true});updateSaveBadge();
     renderHome();renderAdminStu();renderRegisteredStudentsTab();
     return;
   }
@@ -3975,7 +4092,7 @@ function doRegister(){
   updateNavAv(students[students.length-1]);
   toast(`Welcome ${first}! ID: ${id}`,'ok');
   clearReg();
-  saveToStorage();updateSaveBadge();
+   saveToStorage({urgentCloud:true});updateSaveBadge();
   renderHome();renderAdminStu();renderRegisteredStudentsTab();
   // Continue straight into course enrollment for the student just registered
   const pickBtn=document.querySelector('#page-enroll .i-tab[onclick*="showETab(\'pick\'"]');
@@ -4277,7 +4394,7 @@ function unenrollStudentAll(sid){
   if(!active.length)return;
   if(!confirm(`Unenroll ${s.firstName} ${s.lastName} from all ${active.length} active course(s)?`))return;
   active.forEach(e=>{ e.status='dropped'; const c=courses.find(x=>String(x.id).toUpperCase()===String(e.courseId).toUpperCase()); if(c)c.enrolled=Math.max(0,(c.enrolled||0)-1); logEnrollmentAction('drop',sid,e.courseId,'Unenrolled by staff'); });
-  saveToStorage(); updateSaveBadge();
+   saveToStorage(); updateSaveBadge();
   renderActiveEnrollmentStudents(); populateStuSel();
   if(document.getElementById('eStuSel')?.value===sid)loadEnrollStudent();
   renderAdminEnr(); renderAdminStu(); renderHome();
@@ -4346,6 +4463,7 @@ function autoEnrollOneStudent(sid){
     const cid=String(c.id);
     if(enrollments.some(e=>e.studentId===sid&&String(e.courseId).toUpperCase()===cid.toUpperCase()&&e.status==='active'))return;
     if(getPreviousProgramCourseBlock(s,cid)){skipped.push(cid+' (previous program after transfer)');return;}
+    if(!isCourseInAcademicOffering(s.program,cid)){skipped.push(cid+' (not in Academic Offering)');return;}
     if(c.enrolled>=c.seats){skipped.push(cid+' (full)');return;}
     const isFailedRepeat=unrepeated.includes(cid);
     if(unrepeated.length&&!isFailedRepeat&&!hasCourseOverride(sid,cid)){skipped.push(cid+' (failed course must be repeated first)');return;}
@@ -5146,10 +5264,24 @@ function renderPTab(tab){
         const c=courses.find(function(x){return x.id===e.courseId;});
         const res=examResults.filter(function(r){return r.studentId===s.id&&r.courseId===e.courseId;});
         const latest=res[res.length-1];
-        const resHTML=latest
-          ?'<span style="font-size:11px;font-weight:700;color:'+(latest.status==='pass'?'#7ecbb8':'#e87c6e')+';background:'+(latest.status==='pass'?'rgba(58,122,106,.15)':'rgba(192,57,43,.12)')+';padding:2px 9px;border-radius:99px;">'+latest.grade+' · '+latest.total+'/100</span>'
-          :'<span style="font-size:11px;color:var(--tx3);">Awaiting result</span>';
-        const failBadge=latest&&latest.status==='fail'?'<br/><span style="font-size:10px;color:#e87c6e;background:rgba(192,57,43,.12);padding:1px 7px;border-radius:99px;">⚠ Must Repeat</span>':'';
+        const marksBits=[];
+        if(latest){
+          if(latest.sessional!==undefined&&latest.sessional!==null)marksBits.push('S: '+latest.sessional);
+          if(latest.midterm!==undefined&&latest.midterm!==null)marksBits.push('M: '+latest.midterm);
+          if(latest.final!==undefined&&latest.final!==null)marksBits.push('F: '+latest.final);
+        }
+        const marksLine=marksBits.length?'<div style="font-size:10px;color:var(--tx3);margin-top:3px;">'+marksBits.join(' · ')+'</div>':'';
+        let resHTML;
+        if(!latest){
+          resHTML='<span style="font-size:11px;color:var(--tx3);">Awaiting result</span>';
+        }else if(latest.approved || latest.controllerApproved){
+          resHTML='<span style="font-size:11px;font-weight:700;color:'+(latest.status==='pass'?'#7ecbb8':'#e87c6e')+';background:'+(latest.status==='pass'?'rgba(58,122,106,.15)':'rgba(192,57,43,.12)')+';padding:2px 9px;border-radius:99px;">'+latest.grade+' · '+latest.total+'/100</span>'+marksLine;
+        }else if(latest.complete){
+          resHTML='<span style="font-size:11px;font-weight:700;color:#e0a339;background:rgba(224,163,57,.15);padding:2px 9px;border-radius:99px;">⏳ Pending HOD Approval</span>'+marksLine;
+        }else{
+          resHTML='<span style="font-size:11px;color:var(--tx3);">Final pending</span>'+marksLine;
+        }
+        const failBadge=latest&&latest.approved&&latest.status==='fail'?'<br/><span style="font-size:10px;color:#e87c6e;background:rgba(192,57,43,.12);padding:1px 7px;border-radius:99px;">⚠ Must Repeat</span>':'';
         return '<tr>'
           +'<td><strong>'+(c?c.title:e.courseId)+'</strong>'+failBadge+'</td>'
           +'<td><span class="code-badge">'+e.courseId+'</span></td>'
@@ -5201,13 +5333,15 @@ function renderPTab(tab){
     const myRes=examResults.filter(function(r){return r.studentId===s.id;});
     if(!myRes.length){el.innerHTML='<div class="empty-state"><div class="empty-ico">📊</div><div class="empty-txt">No exam results recorded yet.</div></div>';return;}
     const gpa=getGPA(s.id);
-    const passed=myRes.filter(function(r){return r.status==='pass';}).length;
-    const failed=myRes.filter(function(r){return r.status==='fail';}).length;
-    const avgMarks=passed?Math.round(myRes.filter(function(r){return r.status==='pass';}).reduce(function(a,r){return a+r.total;},0)/passed):0;
+    const passed=myRes.filter(function(r){return r.approved&&r.status==='pass';}).length;
+    const failed=myRes.filter(function(r){return r.approved&&r.status==='fail';}).length;
+    const pendingApproval=myRes.filter(function(r){return r.complete&&!r.approved;}).length;
+    const avgMarks=passed?Math.round(myRes.filter(function(r){return r.approved&&r.status==='pass';}).reduce(function(a,r){return a+r.total;},0)/passed):0;
     let html='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;">'
       +'<div class="stat-card" style="padding:16px;"><div class="stat-num">'+gpa+'</div><div class="stat-lbl">CGPA</div></div>'
       +'<div class="stat-card" style="padding:16px;"><div class="stat-num" style="color:#7ecbb8;">'+passed+'</div><div class="stat-lbl">Passed</div></div>'
       +'<div class="stat-card" style="padding:16px;"><div class="stat-num" style="color:#e87c6e;">'+failed+'</div><div class="stat-lbl">Failed</div></div>'
+      +'<div class="stat-card" style="padding:16px;"><div class="stat-num" style="color:#e0a339;">'+pendingApproval+'</div><div class="stat-lbl">Pending Final Approval</div></div>'
       +'<div class="stat-card" style="padding:16px;"><div class="stat-num">'+avgMarks+'%</div><div class="stat-lbl">Avg Score</div></div>'
       +'</div>'
       +'<div style="background:var(--ink2);border:1px solid var(--bdr);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;gap:20px;flex-wrap:wrap;font-size:12px;">'
@@ -5225,18 +5359,23 @@ function renderPTab(tab){
       +'</tr></thead><tbody>'
       +myRes.map(function(r){
         const c=courses.find(function(x){return x.id===r.courseId;});
-        const isF=r.status==='fail';
+        const isF=r.approved&&r.status==='fail';
+        const statusBadge=!r.complete
+          ?'<span style="font-size:10px;padding:2px 9px;border-radius:99px;font-weight:600;background:rgba(255,255,255,.05);color:var(--tx3);">IN PROGRESS</span>'
+          :!r.approved
+            ?'<span style="font-size:10px;padding:2px 9px;border-radius:99px;font-weight:600;background:rgba(224,163,57,.15);color:#e0a339;">⏳ PENDING HOD</span>'
+            :'<span style="font-size:10px;padding:2px 9px;border-radius:99px;font-weight:600;background:'+(isF?'rgba(192,57,43,.12)':'rgba(58,122,106,.15)')+';color:'+(isF?'#e87c6e':'#7ecbb8')+'">'+(isF?'FAIL':'PASS')+'</span>';
         return '<tr style="'+(isF?'background:rgba(192,57,43,.04);':'')+'">'
           +'<td><strong>'+(c?c.title:r.courseId)+'</strong>'+(isF?' <span style="font-size:10px;background:rgba(192,57,43,.15);color:#e87c6e;padding:1px 7px;border-radius:99px;margin-left:4px;">REPEAT</span>':'')+'</td>'
           +'<td><span class="code-badge">'+r.courseId+'</span></td>'
           +'<td>'+(c?c.credits:'—')+'</td>'
-          +'<td style="text-align:center;"><span style="font-weight:600;color:#f5c060;">'+(r.sessional!==undefined?r.sessional:'—')+'</span></td>'
-          +'<td style="text-align:center;"><span style="font-weight:600;color:#7db8e0;">'+(r.midterm!==undefined?r.midterm:'—')+'</span></td>'
-          +'<td style="text-align:center;"><span style="font-weight:600;color:#7ecbb8;">'+(r.final!==undefined?r.final:'—')+'</span></td>'
-          +'<td style="text-align:center;"><strong style="font-size:15px;color:'+(isF?'#e87c6e':'var(--tx)')+';">'+r.total+'</strong></td>'
-          +'<td style="text-align:center;"><span style="font-weight:800;font-size:16px;color:'+(isF?'#e87c6e':'#7ecbb8')+';">'+r.grade+'</span></td>'
-          +'<td style="text-align:center;color:var(--tx2);">'+r.gp.toFixed(1)+'</td>'
-          +'<td><span style="font-size:10px;padding:2px 9px;border-radius:99px;font-weight:600;background:'+(isF?'rgba(192,57,43,.12)':'rgba(58,122,106,.15)')+';color:'+(isF?'#e87c6e':'#7ecbb8')+'">'+(isF?'FAIL':'PASS')+'</span></td>'
+          +'<td style="text-align:center;"><span style="font-weight:600;color:#f5c060;">'+(r.sessional!==undefined&&r.sessional!==null?r.sessional:'—')+'</span></td>'
+          +'<td style="text-align:center;"><span style="font-weight:600;color:#7db8e0;">'+(r.midterm!==undefined&&r.midterm!==null?r.midterm:'—')+'</span></td>'
+          +'<td style="text-align:center;"><span style="font-weight:600;color:#7ecbb8;">'+(r.final!==undefined&&r.final!==null?r.final:'—')+'</span></td>'
+          +'<td style="text-align:center;"><strong style="font-size:15px;color:'+(isF?'#e87c6e':'var(--tx)')+';">'+(r.complete?r.total:'—')+'</strong></td>'
+          +'<td style="text-align:center;"><span style="font-weight:800;font-size:16px;color:'+(isF?'#e87c6e':'#7ecbb8')+';">'+(r.complete?(r.approved?r.grade:r.grade+' (unposted)'):'—')+'</span></td>'
+          +'<td style="text-align:center;color:var(--tx2);">'+(r.complete&&r.approved?r.gp.toFixed(1):'—')+'</td>'
+          +'<td>'+statusBadge+'</td>'
           +'<td style="font-size:11px;color:var(--tx3);white-space:nowrap;">'+r.date+'</td>'
           +'</tr>';
       }).join('')
@@ -6630,12 +6769,13 @@ function renderAdminOffering(){
       <td>${escHtml(o.mode||'—')}</td>
       <td>${escHtml(o.hoursPerWeek??'—')}</td>
       <td>${escHtml(o.capacity??'—')}</td>
+      <td>${offeringResultStatusCellHTML(o)}</td>
       <td><div class="offering-actions">
         <button class="btn btn-dark btn-xs offering-icon-btn" title="Assign Faculty" aria-label="Assign Faculty" onclick="openAssignFaculty('${escHtml(o.id||'')}')">👤</button>
         <button class="btn btn-dark btn-xs offering-icon-btn" title="Edit Offering" aria-label="Edit Offering" onclick="openEditOfferingCourse('${escHtml(o.id||'')}')">✎</button>
         <button class="btn btn-crimson btn-xs offering-icon-btn" title="Delete Offering" aria-label="Delete Offering" onclick="deleteOfferingEntry('${escHtml(o.id||'')}')">🗑</button>
       </div></td></tr>`;
-  }).join(''):'<tr><td colspan="14" style="text-align:center;color:var(--tx3);padding:20px;">No offering rows yet — generate from a Plan of Study or upload an Excel file above.</td></tr>';
+  }).join(''):'<tr><td colspan="15" style="text-align:center;color:var(--tx3);padding:20px;">No offering rows yet — generate from a Plan of Study or upload an Excel file above.</td></tr>';
 }
 
 // Inline dropdown shown on Elective / Specialisation slot rows in the Course Offering
@@ -6791,7 +6931,7 @@ function saveOfferingCourse(){
     academicOffering.push(obj);
     toast('Course added to offering!','ok');
   }
-  closeM('mOffering');saveToStorage();renderAdminOffering();
+   closeM('mOffering');saveToStorage({urgentCloud:true});renderAdminOffering();
 }
 
 function resetCourseOffering(){
@@ -7149,7 +7289,7 @@ function loadResultsForStudent(){
   banner.style.display='';
   banner.innerHTML=`<div class="alert alert-i"><span class="alert-ico">ℹ</span>
     <strong>${s.firstName} ${s.lastName}</strong> · ${s.id} · ${s.dept} · CGPA: <strong>${gpa}</strong>
-    <span style="margin-left:12px;font-size:11px;opacity:.7;">Sessional /40 · Midterm /20 · Final /40 = Total /100</span>
+    <span style="margin-left:12px;font-size:11px;opacity:.7;">Sessional /40 (Quiz 10 + Assignment 10 + Presentation 10 + Participation 10) · Midterm /20 · Final /40 = Total /100</span>
   </div>`;
   const active=enrollments.filter(e=>e.studentId===sid&&e.status==='active');
   const failed=examResults.filter(r=>r.studentId===sid&&r.status==='fail'&&!hasCompleted(sid,r.courseId));
@@ -7180,9 +7320,10 @@ function loadResultsForStudent(){
       <td><span class="code-badge">${cid}</span></td>
       <td>${c?.credits||'—'}</td>
       <td>
-        <input type="number" id="s_${cid}" min="0" max="40" placeholder="/40"
-          style="width:58px;padding:5px 8px;font-size:12px;border:1px solid rgba(200,132,42,.3);"
-          oninput="liveTotal('${cid}')" value="${latest?.sessional??''}"/>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(58px,1fr));gap:4px;min-width:150px;">
+          ${[['quiz','Quiz',10],['assignment','Assignment',10],['presentation','Presentation',10],['participation','Participation',10]].map(([k,l,m])=>`<label style="font-size:9px;color:var(--tx3);">${l} /${m}<input type="number" id="s_${k}_${cid}" min="0" max="${m}" step="0.5" placeholder="0" style="width:100%;padding:4px 5px;font-size:11px;border:1px solid rgba(200,132,42,.3);" oninput="liveTotal('${cid}')" value="${latest?.sessionalSubmarks?.[k]??''}"/></label>`).join('')}
+        </div>
+        <div style="font-size:9px;color:var(--tx3);margin-top:3px;">Sessional total /40: <strong id="s_total_${cid}">${latest?.sessional??'—'}</strong></div>
       </td>
       <td>
         <input type="number" id="m_${cid}" min="0" max="20" placeholder="/20"
@@ -7210,10 +7351,19 @@ function loadResultsForStudent(){
   }).join('');
 }
 
+function getSessionalSubmarks(cid){
+  const keys=['quiz','assignment','presentation','participation'];
+  const max={quiz:10,assignment:10,presentation:10,participation:10};
+  const out={};let total=0,hasAny=false;
+  keys.forEach(k=>{const raw=document.getElementById('s_'+k+'_'+cid)?.value;if(raw!==undefined&&raw!==''){const n=parseFloat(raw);if(Number.isFinite(n)){out[k]=n;total+=n;hasAny=true;}}});
+  return {values:out,total:Math.min(MAX_SESSIONAL,total),hasAny};
+}
 function liveTotal(cid){
-  const sv=parseFloat(document.getElementById('s_'+cid)?.value)||0;
+  const sm=getSessionalSubmarks(cid);
+  const sv=sm.total;
   const mv=parseFloat(document.getElementById('m_'+cid)?.value)||0;
   const fv=parseFloat(document.getElementById('f_'+cid)?.value)||0;
+  const st=document.getElementById('s_total_'+cid);if(st)st.textContent=sm.hasAny?Math.round(sv*10)/10:'—';
   const tot=Math.min(sv,MAX_SESSIONAL)+Math.min(mv,MAX_MIDTERM)+Math.min(fv,MAX_FINAL);
   const g=calcGrade(tot);
   const tel=document.getElementById('tot_'+cid);
@@ -7226,11 +7376,14 @@ function liveTotal(cid){
 
 function saveResult(sid,cid){
   if(!requireStudentAccess(sid))return;
-  const sv=parseFloat(document.getElementById('s_'+cid)?.value);
+  const sm=getSessionalSubmarks(cid);
+  const sv=sm.total;
   const mv=parseFloat(document.getElementById('m_'+cid)?.value);
   const fv=parseFloat(document.getElementById('f_'+cid)?.value);
-  if(isNaN(sv)||isNaN(mv)||isNaN(fv)){toast('Enter all three marks (Sessional, Midterm, Final).','warn');return;}
-  if(sv<0||sv>MAX_SESSIONAL){toast(`Sessional must be 0–${MAX_SESSIONAL}.`,'warn');return;}
+  const missingSub=Object.keys(sm.values).length!==4;
+  if(!sm.hasAny||missingSub||isNaN(mv)||isNaN(fv)){toast('Enter all four Sessional sub-marks, plus Midterm and Final.','warn');return;}
+  for(const [k,v] of Object.entries(sm.values)){if(v<0||v>10){toast(`${k} Sessional sub-mark must be 0–10.`,'warn');return;}}
+  if(sv<0||sv>MAX_SESSIONAL){toast(`Sessional total must be 0–${MAX_SESSIONAL}.`,'warn');return;}
   if(mv<0||mv>MAX_MIDTERM){toast(`Midterm must be 0–${MAX_MIDTERM}.`,'warn');return;}
   if(fv<0||fv>MAX_FINAL){toast(`Final must be 0–${MAX_FINAL}.`,'warn');return;}
   const sessional=Math.round(sv*10)/10;
@@ -7239,8 +7392,10 @@ function saveResult(sid,cid){
   const total=Math.round((sessional+midterm+final_)*10)/10;
   const g=calcGrade(total);
   const isPassed=g.gp>=1.0;
-  const result={studentId:sid,courseId:cid,sessional,midterm,final:final_,total,grade:g.grade,gp:g.gp,status:isPassed?'pass':'fail',date:new Date().toLocaleDateString()};
-  examResults.push(result);
+  const result={studentId:sid,courseId:cid,sessional,sessionalSubmarks:sm.values,midterm,final:final_,total,grade:g.grade,gp:g.gp,status:isPassed?'pass':'fail',complete:true,approved:false,hodApproved:false,deanApproved:false,controllerApproved:false,date:new Date().toLocaleDateString(),term:currentSessionLabel(),postedBy:currentActorInfo()};
+  const prevIdx=examResults.findIndex(r=>String(r.studentId)===String(sid)&&String(r.courseId)===String(cid)&&!r.approved);
+  if(prevIdx>=0)examResults[prevIdx]=result;else examResults.push(result);
+  saveToStorage();
   if(isPassed){
     const idx=enrollments.findIndex(e=>e.studentId===sid&&e.courseId===cid&&e.status==='active');
     if(idx>-1){enrollments[idx].status='completed';courses.find(x=>x.id===cid).enrolled--;}
@@ -7870,7 +8025,7 @@ function saveTeacher(){
   else{teachers.push(obj);toast('Faculty added!','ok');}
   const wasFromOffering=returnToOfferingAfterFacultyCreate;
   returnToOfferingAfterFacultyCreate=false;
-  closeM('mTeacher');renderTeachers();saveToStorage();
+   closeM('mTeacher');renderTeachers();saveToStorage({urgentCloud:true});
   if(wasFromOffering){
     populateOfferingFacultySelect(obj.name);
     document.getElementById('offFacultyType').value=obj.facultyType&&['Regular','Visiting','TBA'].includes(obj.facultyType)?obj.facultyType:'Regular';
@@ -9225,8 +9380,16 @@ const DSU_DRIVE_SECRET_KEY = 'dsu_drive_backup_secret_v1';
 const DSU_CLOUD_SECRET = 'YjE4fgrZ6dr1EHdSYPQvK9YbmfnWjUd7';
 
 // Save all mutable state to localStorage
-function saveToStorage(){
+// `urgentCloud` is used for user-confirmed saves (accounts, faculty,
+// students and academic offerings). Those records must reach Drive
+// immediately instead of waiting for the normal debounce window.
+function saveToStorage(options){
+  options=options||{};
+  _localCloudSaveSeq++;
   bumpDataGen();
+  // Keep the password vault in step with every save so a generated student or
+  // faculty login can never be lost when shared data is pulled back in.
+  try{ if(typeof saveAccountPasswordVault==='function')saveAccountPasswordVault(); }catch(e){}
   try{
     const state={
       students,
@@ -9260,7 +9423,7 @@ function saveToStorage(){
   // Every save queues a debounced push to the shared Google Drive copy so
   // other devices (other Program Managers, students, faculty) see the change
   // within a few seconds instead of only living in this browser's storage.
-  scheduleCloudPush();
+  scheduleCloudPush(options.urgentCloud?{immediate:true}:undefined);
 }
 
 // Restore all mutable in-memory arrays/objects from a plain state object.
@@ -9279,7 +9442,7 @@ function applyPortalState(state, enrolledMapOverride){
   studyPlans.length=0;  (state.studyPlans||[]).forEach(x=>studyPlans.push(x));
   seriesPlanTags={...DEFAULT_SERIES_PLAN_TAGS,...(state.seriesPlanTags||{})};
   adminOverrides.length=0; (state.adminOverrides||[]).forEach(x=>adminOverrides.push(x));
-  accounts.length=0; (state.accounts||[]).forEach(x=>accounts.push(x));
+  mergeIncomingAccounts(state.accounts||[]);
   repairStudentLoginAccounts();
   auditLog.length=0; (state.auditLog||[]).forEach(x=>auditLog.push(x));
   academicOffering.length=0; (state.academicOffering||[]).forEach(x=>academicOffering.push(x));
@@ -9320,6 +9483,95 @@ function loadFromStorage(){
     return false;
   }
 }
+
+
+let _accountPwdBackfilled=false;
+// ── ACCOUNT MERGE (password-safe) ──
+// Older builds pushed the shared cloud copy with passwords stripped out. When
+// such a copy is pulled, the account rows still appear in Admin → Accounts but
+// have no usable password, so the generated student/faculty logins are
+// rejected at sign-in. Merging (instead of blindly replacing) keeps the
+// password this device already knows, and generates a fresh one only when no
+// password exists anywhere — so every listed account can always sign in.
+function localAccountPasswordMap(){
+  const map={};
+  const add=list=>{
+    (list||[]).forEach(a=>{
+      const key=normalizeLoginId(a&&a.id);
+      const pwd=accountPassword(a);
+      if(key&&pwd&&!map[key])map[key]=pwd;
+    });
+  };
+  add(accounts);
+  try{
+    const raw=localStorage.getItem(DB_KEY);
+    if(raw)add((JSON.parse(raw)||{}).accounts);
+  }catch(e){}
+  try{
+    const raw=localStorage.getItem('dsu_account_pwd_vault_v1');
+    if(raw){
+      const vault=JSON.parse(raw)||{};
+      Object.keys(vault).forEach(k=>{ if(!map[k])map[k]=vault[k]; });
+    }
+  }catch(e){}
+  return map;
+}
+function saveAccountPasswordVault(){
+  try{
+    const vault={};
+    (accounts||[]).forEach(a=>{
+      const key=normalizeLoginId(a&&a.id);
+      const pwd=accountPassword(a);
+      if(key&&pwd)vault[key]=pwd;
+    });
+    localStorage.setItem('dsu_account_pwd_vault_v1',JSON.stringify(vault));
+  }catch(e){}
+}
+function mergeIncomingAccounts(incoming){
+  const known=localAccountPasswordMap();
+  const merged=(incoming||[]).map(a=>{
+    const row={...a};
+    const key=normalizeLoginId(row.id);
+    if(!accountPassword(row)&&known[key])row.pwd=known[key];
+    if(!accountPassword(row)){row.pwd=genRandomPassword(8);_accountPwdBackfilled=true;}
+    delete row.password; delete row.pass;
+    return row;
+  });
+  accounts.length=0;
+  merged.forEach(a=>accounts.push(a));
+  saveAccountPasswordVault();
+}
+
+// ── SAVE BAR (top of every page/component) ──
+// Writes to this browser immediately and pushes the same data to the shared
+// Google Drive copy right away, instead of waiting for the debounce window.
+function saveNow(){
+  try{
+    if(typeof repairStudentLoginAccounts==='function')repairStudentLoginAccounts();
+    saveAccountPasswordVault();
+    saveToStorage({urgentCloud:true});
+    if(typeof updateSaveBadge==='function')updateSaveBadge();
+    cloudPush({manual:true});
+  }catch(e){
+    console.warn('DSU save failed',e);
+    if(typeof toast==='function')toast('Could not save. Please try again.','err');
+  }
+}
+function injectSaveBars(){
+  document.querySelectorAll('.page').forEach(page=>{
+    const host=page.querySelector(':scope > .page-inner')||page;
+    if(!host)return;
+    const first=host.firstElementChild;
+    if(first&&first.classList&&first.classList.contains('dsu-savebar'))return;
+    if(host===page&&!host.children.length)return;
+    const bar=document.createElement('div');
+    bar.className='dsu-savebar';
+    bar.innerHTML='<button class="btn btn-amber btn-sm" onclick="saveNow()">\ud83d\udcbe Save &amp; Sync to Google Drive</button>'+
+                  '<span class="dsu-savebar-note">Saves this page and every change to Google Drive.</span>';
+    host.insertBefore(bar,host.firstChild);
+  });
+}
+document.addEventListener('DOMContentLoaded',()=>{ injectSaveBars(); setInterval(injectSaveBars,1200); });
 
 // ── GOOGLE DRIVE BACKUP ──
 // Sends the complete mutable portal state to the user's deployed Apps Script.
@@ -9397,6 +9649,9 @@ function updateSyncStatus(state,when){
 let _cloudBaseVersion=Number((function(){try{return localStorage.getItem('dsu_cloud_version')||0;}catch(e){return 0;}})());
 let _cloudSyncReady=false;
 let _cloudPullInFlight=false;
+let _cloudSavePendingBeforeReady=false;
+let _localCloudSaveSeq=0;
+let _lastCloudPullSaveSeq=0;
 async function cloudPull(opts){
   opts=opts||{};
   if(!DSU_DRIVE_BACKUP_URL||_cloudPullInFlight)return false;
@@ -9409,10 +9664,24 @@ async function cloudPull(opts){
     _cloudPullInFlight=false;
     if(!json||!json.ok){updateSyncStatus('err');return false;}
     if(!json.data){ updateSyncStatus('ok',json.savedAt); return false; } // cloud store empty — nothing to pull yet
+    // Never replace a local mutation that has not been pushed yet. This is
+    // especially important when the portal is open on two devices: a
+    // background pull must not erase a newly-created account, faculty record,
+    // student or offering before its debounced push runs.
+    if(!opts.force && _localCloudSaveSeq>_lastCloudPullSaveSeq){
+      updateSyncStatus('sync');
+      return false;
+    }
     if(Number(json.version||0)<=_cloudBaseVersion && !opts.force){ updateSyncStatus('ok',json.savedAt); return false; }
+    _accountPwdBackfilled=false;
     applyPortalState(json.data, json.data.enrolledMap);
-    try{ localStorage.setItem(DB_KEY, JSON.stringify({...json.data, savedAt:json.savedAt})); }catch(e){}
+    try{ localStorage.setItem(DB_KEY, JSON.stringify({...json.data, accounts, savedAt:json.savedAt})); }catch(e){}
+    // If the cloud copy arrived without usable passwords, the merge generated
+    // them locally — push straight back so every device shares the same
+    // working credentials.
+    if(_accountPwdBackfilled){ _accountPwdBackfilled=false; saveToStorage({urgentCloud:true}); }
     _cloudBaseVersion=Number(json.version||0);
+    _lastCloudPullSaveSeq=_localCloudSaveSeq;
     try{localStorage.setItem('dsu_cloud_version',String(_cloudBaseVersion));}catch(e){}
     updateSyncStatus('ok',json.savedAt);
     if(opts.rerender!==false){
@@ -9438,9 +9707,15 @@ async function cloudPull(opts){
 // backend can tell us if another device saved in between.
 let _cloudPushTimer=null;
 function scheduleCloudPush(){
-  if(!_cloudSyncReady||!DSU_DRIVE_BACKUP_URL)return;
+  const opts=arguments[0]||{};
+  if(!DSU_DRIVE_BACKUP_URL)return;
+  if(!_cloudSyncReady){
+    _cloudSavePendingBeforeReady=true;
+    return;
+  }
   clearTimeout(_cloudPushTimer);
-  _cloudPushTimer=setTimeout(()=>{cloudPush();}, 1800);
+  _cloudSavePendingBeforeReady=false;
+  _cloudPushTimer=setTimeout(()=>{cloudPush();}, opts.immediate?0:1800);
 }
 async function cloudPush(opts){
   opts=opts||{};
@@ -9463,11 +9738,15 @@ async function cloudPush(opts){
       return;
     }
     _cloudBaseVersion=json.version;
+    _lastCloudPullSaveSeq=_localCloudSaveSeq;
     try{localStorage.setItem('dsu_cloud_version',String(_cloudBaseVersion));}catch(e){}
     updateSyncStatus('ok',json.savedAt);
     if(json.conflict){
-      toast('Another device saved changes at nearly the same time — pulling the merged latest copy.','warn');
-      await cloudPull({force:true,announce:false,rerender:true});
+      // Do not force-replace unsent local edits after a concurrent save.
+      // cloudPull will apply the remote copy only when this device has no
+      // newer local save waiting to be written.
+      toast('Another device saved changes at nearly the same time — keeping your local changes and refreshing the cloud version.','warn');
+      await cloudPull({force:false,announce:false,rerender:true});
     }else if(opts.manual){
       toast('Saved to the cloud — visible on every device.','ok');
     }
@@ -9796,6 +10075,12 @@ function onAccRoleChange(){
     if(programWrap) programWrap.style.display = '';
     if(mgrTabsWrap) mgrTabsWrap.style.display = '';
     if(autoWrap) autoWrap.style.display = 'none';
+  } else if(role === 'dean' || role === 'controller'){
+    linkWrap.style.display = 'none';
+    nameWrap.style.display = '';
+    if(programWrap) programWrap.style.display = 'none';
+    if(mgrTabsWrap) mgrTabsWrap.style.display = 'none';
+    if(autoWrap) autoWrap.style.display = 'none';
   } else {
     linkWrap.style.display = '';
     nameWrap.style.display = 'none';
@@ -9823,7 +10108,7 @@ function saveAccount(){
   const id = document.getElementById('acc-id').value.trim().replace(/\s+/g,'');
   const pwd = document.getElementById('acc-pwd').value;
   const pwd2 = document.getElementById('acc-pwd2').value;
-  const ref = (role!=='admin'&&role!=='program_manager') ? document.getElementById('acc-link-ref').value : null;
+  const ref = (role==='student'||role==='teacher') ? document.getElementById('acc-link-ref').value : null;
   const nameInput = document.getElementById('acc-name').value.trim();
   const errEl = document.getElementById('acc-err');
   errEl.style.display='none';
@@ -9841,8 +10126,8 @@ function saveAccount(){
     if(pwd.length < 6){ showErr('Password must be at least 6 characters.'); return; }
     if(pwd !== pwd2){ showErr('Passwords do not match.'); return; }
   }
-  if(role!=='admin'&&role!=='program_manager'&&!ref){showErr('Please link this account to a '+role+'.');return;}
-  if((role==='admin'||role==='program_manager')&&!nameInput){showErr('Please enter the full name.');return;}
+  if((role==='student'||role==='teacher')&&!ref){showErr('Please link this account to a '+role+'.');return;}
+  if((role==='admin'||role==='program_manager'||role==='dean'||role==='controller')&&!nameInput){showErr('Please enter the full name.');return;}
   const program=role==='program_manager'?document.getElementById('acc-program').value:null;
   if(role==='program_manager'&&!isManagerAllowedProgram(program)){showErr('Please select a valid program scope: BBA, BS-AF or BS-BAP.');return;}
   const mgrTabs=role==='program_manager'?{
@@ -9856,7 +10141,7 @@ function saveAccount(){
   if(role === 'student'){
     const s = students.find(x=>x.id===ref);
     name = s ? s.firstName+' '+s.lastName : ref;
-  } else if(role === 'program_manager'){
+  } else if(role === 'program_manager'||role==='dean'||role==='controller'){
     name=nameInput;
   } else if(role === 'teacher'){
     const t = teachers.find(x=>x.id===ref);
@@ -9879,7 +10164,7 @@ function saveAccount(){
     toast('Account "'+id+'" created!','ok');
   }
 
-  saveToStorage(); updateSaveBadge();
+  saveToStorage({urgentCloud:true}); updateSaveBadge();
   closeM('mAccount');
   if(currentUser&&currentUser.id===id)applyManagerTabVisibility();
   renderAccountsTab();
@@ -9967,7 +10252,8 @@ function bulkGenerateStudentAccounts(){
       createdAt: new Date().toLocaleDateString()
     });
   });
-  saveToStorage(); updateSaveBadge();
+  repairStudentLoginAccounts();
+  saveToStorage({urgentCloud:true}); updateSaveBadge();
   renderAccountsTab();
   toast('Created '+missing.length+' student account(s). Download the credentials sheet to hand them out.','ok');
   downloadStudentCredentials();
@@ -9995,7 +10281,8 @@ function bulkGenerateFacultyAccounts(){
       createdAt:new Date().toLocaleDateString()
     });
   });
-  saveToStorage(); updateSaveBadge();
+  repairStudentLoginAccounts();
+  saveToStorage({urgentCloud:true}); updateSaveBadge();
   renderAccountsTab();
   toast('Created '+missing.length+' faculty account(s). Download the credentials sheet to hand them out.','ok');
   downloadFacultyCredentials();
@@ -10055,8 +10342,8 @@ function renderAccountsTab(){
     return;
   }
 
-  const roleColors = {student:'var(--amber2)',teacher:'#7db8e0',program_manager:'#c8842a',admin:'#7ecbb8'};
-  const roleLabels = {student:'🎓 Student',teacher:'👨‍🏫 Faculty',program_manager:'🏢 Program Manager',admin:'⚙️ Admin'};
+  const roleColors = {student:'var(--amber2)',teacher:'#7db8e0',program_manager:'#c8842a',dean:'#c478f5',controller:'#4a90c4',admin:'#7ecbb8'};
+  const roleLabels = {student:'🎓 Student',teacher:'👨‍🏫 Faculty',program_manager:'🏢 Program Manager / HOD',dean:'🎓 Dean',controller:'📋 Controller of Examination',admin:'⚙️ Admin'};
 
   tb.innerHTML = filtered.map(a=>{
     // Resolve linked record
@@ -10268,6 +10555,7 @@ async function cloudPullWithTimeout(ms){
 }
 function finishInit(){
   _cloudSyncReady=true;
+  if(_cloudSavePendingBeforeReady)scheduleCloudPush({immediate:true});
   if(!DSU_DRIVE_BACKUP_URL){
     const el=document.getElementById('cloudSyncBadge');
     if(el){el.textContent='☁ Cloud sync disabled';el.style.color='var(--tx3)';}
@@ -10336,7 +10624,7 @@ function finishInit(){
 // AUTH & ROLE SYSTEM
 // ══════════════════════════════════════
 // currentUser is declared before startup so renderHome/enrollment helpers can safely run during initialization
-let selectedLoginRole='admin';
+let selectedLoginRole='student';
 
 function selectLoginRole(role,el){
   selectedLoginRole=role;
@@ -10394,7 +10682,9 @@ function normalizeAccountRole(value){
   const role=String(value||'').trim().toLowerCase().replace(/[\s-]+/g,'_');
   if(role==='student'||role==='students')return 'student';
   if(role==='teacher'||role==='faculty'||role==='staff')return 'teacher';
-  if(role==='program_manager'||role==='programmanager')return 'program_manager';
+  if(role==='program_manager'||role==='programmanager'||role==='hod'||role==='head_of_department')return 'program_manager';
+  if(role==='dean')return 'dean';
+  if(role==='controller'||role==='controller_of_examination'||role==='controller_of_examinations')return 'controller';
   if(role==='admin'||role==='administrator')return 'admin';
   return role;
 }
@@ -10482,9 +10772,17 @@ function doLogin(){
     errEl.style.display='block';
     return;
   }
-  if(selectedLoginRole==='student'&&acctRole!=='student'){errEl.textContent='Please use the Student login tab.';errEl.style.display='block';return;}
-  if(selectedLoginRole==='teacher'&&acctRole!=='teacher'){errEl.textContent='Please use the Faculty login tab.';errEl.style.display='block';return;}
-  if(selectedLoginRole==='admin'&&acctRole!=='admin'&&acctRole!=='program_manager'){errEl.textContent='Please use the Admin login tab.';errEl.style.display='block';return;}
+  // A matched account's real role is authoritative. Previously a tab/role
+  // mismatch (e.g. a student signing in while the "Admin" tab — the default
+  // active tab — was still selected) hard-blocked an otherwise-correct
+  // login. Instead, auto-correct the selected tab to match the account that
+  // was actually found, so valid credentials are never rejected just because
+  // the wrong tab happened to be active.
+  if(selectedLoginRole!==acctRole&&!(selectedLoginRole==='admin'&&acctRole==='program_manager')){
+    const tabRole=acctRole==='program_manager'?'admin':acctRole;
+    const tabEl=[...document.querySelectorAll('#loginRoleTabs .role-tab')].find(t=>t.getAttribute('onclick')?.includes(`'${tabRole}'`));
+    if(tabEl)selectLoginRole(tabRole,tabEl); else selectedLoginRole=tabRole;
+  }
   if(acctRole==='student'){
     const linkedStudent=findStudentForAccount(acct);
     if(!linkedStudent){errEl.textContent='This student account is not linked to a valid student record. Ask an admin to edit the account and select the student again.';errEl.style.display='block';currentUser=null;return;}
@@ -10498,7 +10796,7 @@ function doLogin(){
   currentUser=acct;
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appRoot').style.display='block';
-  document.body.classList.remove('role-student','role-teacher','role-admin','role-program_manager');
+  document.body.classList.remove('role-student','role-teacher','role-admin','role-program_manager','role-dean','role-controller');
   document.body.classList.add('role-'+acct.role);
   applyManagerTabVisibility();
   document.getElementById('navAv').textContent=(acct.name||acct.id).split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
@@ -10511,13 +10809,13 @@ function doLogin(){
   const startBtn=[...document.querySelectorAll('.ntab')].find(t=>t.getAttribute('onclick')?.includes("goPage('portal'")&&acct.role==='student') || document.querySelector('.ntab');
   if(startBtn)startBtn.classList.add('active');
   if(startPage==='portal')renderPortal(); else renderHome();
-  if(acct.role==='admin'||acct.role==='program_manager')setTimeout(initAdminPage,50);
+  if(acct.role==='admin'||acct.role==='program_manager'||acct.role==='dean'||acct.role==='controller')setTimeout(initAdminPage,50);
   toast('Welcome back, '+acct.name+'!','ok');
 }
 
 function doLogout(){
   currentUser=null;activeId=null;
-  document.body.classList.remove('role-student','role-teacher','role-admin','role-program_manager');
+  document.body.classList.remove('role-student','role-teacher','role-admin','role-program_manager','role-dean','role-controller');
   document.getElementById('appRoot').style.display='none';
   document.getElementById('loginScreen').style.display='flex';
   document.getElementById('loginId').value='';
@@ -10728,7 +11026,7 @@ function canEditCourseResults(cid){
   if(isAdminUser()||isProgramManager())return true;
   return currentUser?.role==='teacher'&&getFacultyAssignedCourseIds().some(x=>_ncid(x)===_ncid(cid));
 }
-function latestExamResult(sid,cid){const a=(examResults||[]).filter(r=>String(r.studentId)===String(sid)&&_ncid(r.courseId)===_ncid(cid));return a[a.length-1]||null;}
+function latestExamResult(sid,cid){const cands=[_ncid(cid),...(NC_CODE_ALIASES[_ncid(cid)]||[])];const a=(examResults||[]).filter(r=>String(r.studentId)===String(sid)&&cands.includes(_ncid(r.courseId)));return a[a.length-1]||null;}
 function resultComponentsFor(r,cfg){
   const out={};
   if(r?.components&&typeof r.components==='object')cfg.categories.forEach(cat=>{if(r.components[cat.id]!==undefined)out[cat.id]=Number(r.components[cat.id]);});
@@ -10736,6 +11034,129 @@ function resultComponentsFor(r,cfg){
   return out;
 }
 function calculateFlexibleResult(values,cfg){let total=0;(cfg.categories||[]).forEach(cat=>{let v=Number(values[cat.id]);if(!Number.isFinite(v))v=0;v=Math.max(0,Math.min(Number(cat.max)||0,v));total+=v;});total=Math.round(total*10)/10;const g=calcGrade(total);return{total,grade:g.grade,gp:g.gp,status:g.gp>=1?'pass':'fail'};}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// RESULT WORKFLOW
+// Faculty can save any component (including Sessional/Midterm) immediately.
+// HOD can review partial marks at any time, but a final-result approval queue is
+// created only after EVERY active student in the course has a complete result.
+// HOD approval -> Dean approval -> Controller of Examination approval.
+// Only Controller approval posts the official grade (approved=true).
+// ══════════════════════════════════════════════════════════════════════════════
+function isResultComplete(vals,cfg){return (cfg.categories||[]).every(cat=>vals[cat.id]!==undefined&&vals[cat.id]!==null&&Number.isFinite(Number(vals[cat.id])));}
+function commitExamResult(sid,cid,vals,cfg,extra){
+  const complete=isResultComplete(vals,cfg),calc=complete?calculateFlexibleResult(vals,cfg):null;
+  const prevMatches=examResults.map((r,i)=>({r,i})).filter(x=>String(x.r.studentId)===String(sid)&&String(x.r.courseId)===String(cid));
+  const prevLatest=prevMatches[prevMatches.length-1];
+  const result={studentId:sid,courseId:cid,components:vals,assessments:cfg.categories.map(cat=>({id:cat.id,name:cat.name,max:cat.max,marks:vals[cat.id]})),sessional:sessionalValue,sessionalSubmarks:(extra&&extra.sessionalSubmarks&&Object.keys(extra.sessionalSubmarks).length?extra.sessionalSubmarks:undefined),midterm:vals.midterm,final:vals.final,complete,total:complete?calc.total:undefined,grade:complete?calc.grade:undefined,gp:complete?calc.gp:undefined,status:'pending',approved:false,hodApproved:false,deanApproved:false,controllerApproved:false,date:new Date().toLocaleDateString(),term:currentSessionLabel(),postedBy:currentActorInfo()};
+  if(prevLatest&&(!prevLatest.r.approved||prevLatest.r.status==='pass'))examResults[prevLatest.i]=result;else examResults.push(result);
+  return {complete,calc,result};
+}
+function activeResultStudentIds(cid){return [...new Set(activeEnrollmentsFor(cid).map(e=>String(e.studentId)))];}
+function courseAllResultsComplete(cid){
+  const ids=activeResultStudentIds(cid);if(!ids.length)return false;
+  return ids.every(sid=>{const r=latestExamResult(sid,cid);return !!(r&&r.complete);});
+}
+function resultHasAnyMarks(r){return !!(r&&(r.components&&Object.keys(r.components).length||r.sessional!==undefined||r.midterm!==undefined||r.final!==undefined));}
+function pendingHODResultsForCourse(cid){return examResults.filter(r=>String(r.courseId)===String(cid)&&r.complete&&!r.hodApproved&&!r.approved);}
+function pendingHODCourseIds(){
+  const ids=new Set(examResults.filter(r=>r.complete&&!r.hodApproved&&!r.approved).map(r=>String(r.courseId)));
+  let list=[...ids].filter(cid=>courseAllResultsComplete(cid));
+  if(isProgramManager()){const scoped=new Set((academicOffering||[]).filter(o=>normalizeProgramKey(o.program)===managerProgram()).map(offeringCourseCode));list=list.filter(cid=>scoped.has(_ncid(cid)));}
+  return list.sort();
+}
+function partialHODResults(){
+  let rows=(examResults||[]).filter(r=>!r.approved&&!r.hodApproved&&!r.complete&&resultHasAnyMarks(r));
+  if(isProgramManager()){
+    const scoped=new Set((academicOffering||[]).filter(o=>normalizeProgramKey(o.program)===managerProgram()).map(offeringCourseCode));
+    rows=rows.filter(r=>scoped.has(_ncid(r.courseId)));
+  }
+  return rows;
+}
+/* ---- Sessional sub-section breakdown (visible to HOD, Dean, Controller) ---- */
+const SESSIONAL_SUBMARKS=[['quiz','Quiz',10],['assignment','Assignment',10],['presentation','Presentation',10],['participation','Participation',10]];
+function _isSessionalCat(name){return String(name||'').trim().toLowerCase()==='sessional';}
+function resultBreakdownParts(r,cid){
+  const cfg=assessmentConfigForCourse(cid),vals=resultComponentsFor(r,cfg),out=[];
+  (cfg.categories||[]).forEach(cat=>{
+    if(_isSessionalCat(cat.name)&&r&&r.sessionalSubmarks&&Object.keys(r.sessionalSubmarks).length){
+      SESSIONAL_SUBMARKS.forEach(([k,label,max])=>out.push({name:label,max:max,marks:r.sessionalSubmarks[k],sub:true}));
+    }
+    out.push({name:cat.name,max:cat.max,marks:vals[cat.id]});
+  });
+  return out;
+}
+function breakdownTemplateResult(rows){return (rows||[]).find(r=>r&&r.sessionalSubmarks&&Object.keys(r.sessionalSubmarks).length)||(rows||[])[0]||null;}
+function breakdownHeadHTML(cid,rows){
+  return resultBreakdownParts(breakdownTemplateResult(rows),cid).map(p=>
+    `<th style="text-align:center;${p.sub?'font-size:10px;color:#f5c060;font-weight:500;':''}">${escHtml(p.name)}<br><span style="font-size:9px;color:var(--tx3);">/${p.max}</span></th>`).join('');
+}
+function breakdownCellsHTML(r,cid,rows){
+  const shape=resultBreakdownParts(breakdownTemplateResult(rows),cid);
+  const mine=resultBreakdownParts(r,cid);
+  return shape.map((p,i)=>{const v=(mine[i]&&mine[i].name===p.name)?mine[i].marks:(mine.find(x=>x.name===p.name)||{}).marks;
+    return `<td style="text-align:center;${p.sub?'font-size:11px;color:#f5c060;':'font-weight:600;'}">${v??'\u2014'}</td>`;}).join('');
+}
+function breakdownTextHTML(r,cid){
+  const parts=resultBreakdownParts(r,cid).filter(p=>p.sub);
+  if(!parts.length)return '<span style="font-size:11px;color:var(--tx3);">no sub-marks recorded</span>';
+  return parts.map(p=>`<span style="font-size:10px;color:#f5c060;margin-right:6px;white-space:nowrap;">${escHtml(p.name)} ${p.marks??'\u2014'}/${p.max}</span>`).join('');
+}
+function gradeDistributionFor(results){const dist={};GRADE_SCALE.forEach(g=>dist[g.grade]=0);let pass=0,fail=0;results.forEach(r=>{dist[r.grade]=(dist[r.grade]||0)+1;if(r.gp>=1)pass++;else fail++;});return{dist,pass,fail,total:results.length};}
+function approveCourseResults(cid){
+  if(!(isAdminUser()||isProgramManager())){toast('Only the HOD (Program Manager) or Admin can perform HOD approval.','err');return;}
+  if(!courseAllResultsComplete(cid)){toast('HOD approval is locked until all enrolled students have complete results for this course.','warn');return;}
+  const pending=pendingHODResultsForCourse(cid);if(!pending.length){toast('No final results are awaiting HOD approval.','warn');return;}
+  pending.forEach(r=>{r.hodApproved=true;r.hodApprovedAt=new Date().toISOString();r.hodApprovedBy=currentActorInfo();r.hodStatus='approved';});
+  saveToStorage();if(typeof refreshAll==='function')refreshAll();renderResultApproval();toast(`${pending.length} result(s) approved by HOD and sent to Dean for approval.`,'ok');
+}
+function approveSingleResult(sid,cid){
+  if(!(isAdminUser()||isProgramManager())){toast('Only the HOD (Program Manager) or Admin can perform HOD approval.','err');return;}
+  if(!courseAllResultsComplete(cid)){toast('HOD approval is locked until all enrolled students have complete results for this course.','warn');return;}
+  approveCourseResults(cid);
+}
+function pendingDeanResultsForCourse(cid){return examResults.filter(r=>String(r.courseId)===String(cid)&&r.complete&&r.hodApproved&&!r.deanApproved&&!r.approved);}
+function pendingDeanCourseIds(){return [...new Set(examResults.filter(r=>r.complete&&r.hodApproved&&!r.deanApproved&&!r.approved).map(r=>String(r.courseId)))].sort();}
+function approveDeanCourseResults(cid){
+  if(!(isAdminUser()||isDean())){toast('Only the Dean or Admin can approve these results.','err');return;}
+  if(!courseAllResultsComplete(cid)){toast('This course is not complete for all enrolled students.','warn');return;}
+  const rows=pendingDeanResultsForCourse(cid);if(!rows.length){toast('No results are pending Dean approval.','warn');return;}
+  rows.forEach(r=>{r.deanApproved=true;r.deanApprovedAt=new Date().toISOString();r.deanApprovedBy=currentActorInfo();r.deanStatus='approved';});
+  saveToStorage();if(typeof refreshAll==='function')refreshAll();renderDeanApproval();toast(`${rows.length} result(s) approved by Dean and sent to Controller of Examination.`,'ok');
+}
+function pendingControllerResultsForCourse(cid){return examResults.filter(r=>String(r.courseId)===String(cid)&&r.complete&&r.hodApproved&&r.deanApproved&&!r.controllerApproved&&!r.approved);}
+function pendingControllerCourseIds(){return [...new Set(examResults.filter(r=>r.complete&&r.hodApproved&&r.deanApproved&&!r.controllerApproved&&!r.approved).map(r=>String(r.courseId)))].sort();}
+function approveControllerCourseResults(cid){
+  if(!(isAdminUser()||isController())){toast('Only the Controller of Examination or Admin can approve these results.','err');return;}
+  if(!courseAllResultsComplete(cid)){toast('This course is not complete for all enrolled students.','warn');return;}
+  const rows=pendingControllerResultsForCourse(cid);if(!rows.length){toast('No results are pending Controller approval.','warn');return;}
+  rows.forEach(r=>{r.controllerApproved=true;r.controllerApprovedAt=new Date().toISOString();r.controllerApprovedBy=currentActorInfo();r.approved=true;r.approvedAt=r.controllerApprovedAt;r.approvedBy=currentActorInfo();r.status=r.gp>=1?'pass':'fail';if(r.status==='pass'){const idx=enrollments.findIndex(e=>String(e.studentId)===String(r.studentId)&&String(e.courseId)===String(cid)&&e.status==='active');if(idx>-1){enrollments[idx].status='completed';const cc=courses.find(x=>String(x.id)===String(cid));if(cc)cc.enrolled=Math.max(0,(cc.enrolled||0)-1);}}else if(typeof dropBlockedCourses==='function')dropBlockedCourses(r.studentId,cid);});
+  saveToStorage();if(typeof refreshAll==='function')refreshAll();renderControllerApproval();toast(`${rows.length} result(s) approved by Controller of Examination. Official grades are now posted.`,'ok');
+}
+function updateApprovalBadge(){const btn=document.getElementById('approvalsTabBtn');if(!btn)return;const n=pendingHODCourseIds().reduce((a,cid)=>a+pendingHODResultsForCourse(cid).length,0);btn.textContent=n?`✅ HOD Result Approval (${n})`:'✅ HOD Result Approval';}
+function renderResultApproval(){
+  updateApprovalBadge();const host=document.getElementById('at-approvals');if(!host)return;const cids=pendingHODCourseIds(),partials=partialHODResults();
+  host.innerHTML=`<div class="sec-hdr"><div><div class="sec-title">Result Approval — Head of Department</div><div class="sec-sub">Sessional and Midterm marks are visible to the HOD immediately after faculty submission. Final-result approval appears here only when <strong>all enrolled students in the course have complete results</strong>. After HOD approval, the result moves to the separate Dean Approval tab.</div></div></div>
+    <div class="form-shell" style="margin-bottom:20px;"><div class="sec-title" style="font-size:17px;margin-bottom:8px;">📊 Faculty Mark Submission Review</div><div class="sec-sub" style="margin-bottom:12px;">Read-only review of Sessional / Midterm marks already submitted by faculty. These records do not require final approval until the complete course result is ready.</div>
+      ${partials.length?`<div class="tbl-wrap"><table><thead><tr><th>Student</th><th>Course</th><th>Sessional Sub-sections</th><th>Sessional</th><th>Midterm</th><th>Final</th><th>Status</th><th>Submitted By</th></tr></thead><tbody>${partials.map(r=>{const s=students.find(x=>String(x.id)===String(r.studentId));const c=courses.find(x=>_ncid(x.id)===_ncid(r.courseId));return `<tr><td><strong>${escHtml(s?s.firstName+' '+s.lastName:r.studentId)}</strong><br><span class="code-badge">${escHtml(r.studentId)}</span></td><td>${escHtml(c?.title||r.courseId)} <span class="code-badge">${escHtml(r.courseId)}</span></td><td>${breakdownTextHTML(r,r.courseId)}</td><td style="text-align:center;">${r.sessional??'—'}</td><td style="text-align:center;">${r.midterm??'—'}</td><td style="text-align:center;">${r.final??'—'}</td><td><span class="stat-pill pill-amber">IN PROGRESS</span></td><td style="font-size:11px;color:var(--tx3);">${escHtml(r.postedBy?.name||r.postedBy||'—')}</td></tr>`;}).join('')}</tbody></table></div>`:'<div class="empty-state" style="padding:28px;"><div class="empty-txt">No partial Sessional / Midterm submissions are currently waiting for review.</div></div>'}</div>
+    ${cids.length?`<div class="sec-title" style="font-size:18px;margin-bottom:12px;">Final Results Ready for HOD Approval</div><div class="cards-grid" style="margin-bottom:20px">${cids.map(cid=>{const c=courses.find(x=>_ncid(x.id)===_ncid(cid)),pend=pendingHODResultsForCourse(cid),gd=gradeDistributionFor(pend);return `<div class="c-card"><div class="c-card-top"><div class="c-code">${escHtml(cid)} · ${pend.length} complete result(s)</div><div class="c-title">${escHtml(c?.title||cid)}</div><div class="c-dept">All enrolled students complete · Pass: <strong style="color:#7ecbb8;">${gd.pass}</strong> · Fail: <strong style="color:#e87c6e;">${gd.fail}</strong></div></div><div class="c-footer"><button class="btn btn-amber btn-xs" onclick="renderResultApprovalCourse('${escHtml(cid)}')">Review &amp; Approve</button></div></div>`;}).join('')}</div>`:'<div class="empty-state"><div class="empty-ico">⏳</div><div class="empty-txt">No complete course is currently waiting for HOD final-result approval.</div></div>'}<div id="approvalCourseWrap"></div>`;
+}
+function renderResultApprovalCourse(cid){
+  const wrap=document.getElementById('approvalCourseWrap');if(!wrap)return;const c=courses.find(x=>_ncid(x.id)===_ncid(cid)),pend=pendingHODResultsForCourse(cid);if(!pend.length){wrap.innerHTML='';return;}const gd=gradeDistributionFor(pend),gradeChips=GRADE_SCALE.map(g=>gd.dist[g.grade]?`<span class="stat-pill pill-ice" style="margin:2px;">${g.grade}: <strong>${gd.dist[g.grade]}</strong></span>`:'').join('');
+  wrap.innerHTML=`<div class="sec-hdr" style="margin-top:10px;"><div><div class="sec-title" style="font-size:18px;">${escHtml(c?.title||cid)} <span class="code-badge">${escHtml(cid)}</span></div><div class="sec-sub">All enrolled students have complete results. Review before sending to Dean.</div></div><button type="button" class="btn btn-sage btn-sm" onclick="approveCourseResults('${escHtml(cid)}')">✓ HOD Approve All ${pend.length}</button></div><div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px;">${gradeChips}<span class="stat-pill pill-sage">PASS: <strong>${gd.pass}</strong></span><span class="stat-pill" style="margin:2px;background:rgba(192,57,43,.12);color:#e87c6e;">FAIL: <strong>${gd.fail}</strong></span></div><div class="tbl-wrap" style="overflow-x:auto;"><table><thead><tr><th>Student</th><th>ID</th>${breakdownHeadHTML(cid,pend)}<th>Total</th><th>Grade</th><th>Submitted By</th><th>Action</th></tr></thead><tbody>${pend.map(r=>{const s=students.find(x=>String(x.id)===String(r.studentId));const isF=r.gp<1;return `<tr><td><strong>${escHtml(s?s.firstName+' '+s.lastName:r.studentId)}</strong></td><td><span class="code-badge">${escHtml(r.studentId)}</span></td>${breakdownCellsHTML(r,cid,pend)}<td style="text-align:center;"><strong>${r.total}</strong></td><td style="text-align:center;color:${isF?'#e87c6e':'#7ecbb8'};font-weight:700;">${r.grade}</td><td style="font-size:11px;color:var(--tx3);">${escHtml(r.postedBy?.name||r.postedBy||'—')}</td><td><span style="font-size:10px;color:var(--tx3);">Course-level approval</span></td></tr>`;}).join('')}</tbody></table></div>`;
+}
+function renderWorkflowApprovalTab(hostId,title,subtitle,courseIds,rowsForCourse,approveFn,approveLabel){
+  const host=document.getElementById(hostId);if(!host)return;
+  host.innerHTML=`<div class="sec-hdr"><div><div class="sec-title">${title}</div><div class="sec-sub">${subtitle}</div></div></div>${courseIds.length?`<div class="cards-grid">${courseIds.map(cid=>{const c=courses.find(x=>_ncid(x.id)===_ncid(cid)),rows=rowsForCourse(cid),gd=gradeDistributionFor(rows);return `<div class="c-card"><div class="c-card-top"><div class="c-code">${escHtml(cid)} · ${rows.length} result(s)</div><div class="c-title">${escHtml(c?.title||cid)}</div><div class="c-dept">Pass: <strong style="color:#7ecbb8;">${gd.pass}</strong> · Fail: <strong style="color:#e87c6e;">${gd.fail}</strong></div></div><div class="c-footer"><button class="btn btn-amber btn-xs" onclick="renderWorkflowCourse('${escHtml(hostId)}','${escHtml(cid)}','${escHtml(title)}','${escHtml(approveLabel)}')">Review &amp; Approve</button></div></div>`;}).join('')}</div><div id="${hostId}-course-wrap" style="margin-top:20px;"></div>`:'<div class="empty-state"><div class="empty-ico">✅</div><div class="empty-txt">No results are waiting at this approval stage.</div></div>'}`;
+}
+function renderWorkflowCourse(hostId,cid,title,approveLabel){
+  const wrap=document.getElementById(hostId+'-course-wrap');if(!wrap)return;const rows=hostId==='at-dean-approvals'?pendingDeanResultsForCourse(cid):pendingControllerResultsForCourse(cid),c=courses.find(x=>_ncid(x.id)===_ncid(cid));if(!rows.length){wrap.innerHTML='';return;}
+  const fn=hostId==='at-dean-approvals'?'approveDeanCourseResults':'approveControllerCourseResults';
+  wrap.innerHTML=`<div class="sec-hdr"><div><div class="sec-title" style="font-size:18px;">${escHtml(c?.title||cid)} <span class="code-badge">${escHtml(cid)}</span></div><div class="sec-sub">${rows.length} complete result(s) received from the previous approval stage.</div></div><button class="btn btn-sage btn-sm" onclick="${fn}('${escHtml(cid)}')">✓ ${approveLabel} All ${rows.length}</button></div><div class="tbl-wrap" style="overflow-x:auto;"><table><thead><tr><th>Student</th><th>ID</th>${breakdownHeadHTML(cid,rows)}<th>Total</th><th>Grade</th><th>HOD</th><th>Dean</th><th>Action</th></tr></thead><tbody>${rows.map(r=>{const s=students.find(x=>String(x.id)===String(r.studentId));return `<tr><td><strong>${escHtml(s?s.firstName+' '+s.lastName:r.studentId)}</strong></td><td><span class="code-badge">${escHtml(r.studentId)}</span></td>${breakdownCellsHTML(r,cid,rows)}<td><strong>${r.total}</strong></td><td><strong>${r.grade}</strong></td><td style="color:#7ecbb8;">✓ Approved</td><td style="color:${r.deanApproved?'#7ecbb8':'#e0a339'};">${r.deanApproved?'✓ Approved':'Pending'}</td><td><button class="btn btn-dark btn-xs" onclick="${fn}('${escHtml(cid)}')">${approveLabel}</button></td></tr>`;}).join('')}</tbody></table></div>`;
+}
+function renderDeanApproval(){renderWorkflowApprovalTab('at-dean-approvals','Result Approval — Dean','Only complete courses already approved by the HOD appear here. Dean approval is a separate stage and sends the result to the Controller of Examination.',pendingDeanCourseIds,pendingDeanResultsForCourse,approveDeanCourseResults,'Dean Approve');}
+function renderControllerApproval(){renderWorkflowApprovalTab('at-controller-approvals','Result Approval — Controller of Examination','Only complete courses approved by both Faculty/HOD workflow and the Dean appear here. Controller approval posts the official grades to students.',pendingControllerCourseIds,pendingControllerResultsForCourse,approveControllerCourseResults,'Controller Approve');}
+
 function matchResultStudents(v){
   const q=String(v||'').trim().toLowerCase();if(!q)return [];
   const exact=(students||[]).filter(s=>String(s.id||'').trim().toLowerCase()===q);
@@ -10766,16 +11187,137 @@ function renderAssessmentConfigEditor(cid,hostId){
 function saveAssessmentConfig(cidArg){const cid=cidArg||document.getElementById('resultConfigCourse')?.value;if(!cid)return;if(!canEditCourseResults(cid)){toast('This course is not assigned to you.','err');return;}const cats=[...document.querySelectorAll('#assessmentConfigRows .assessment-config-row')].map((r,i)=>({name:r.querySelector('.ac-name')?.value.trim(),max:Number(r.querySelector('.ac-max')?.value)})).filter(x=>x.name&&x.max>0).map((x,i)=>({id:normalizeAssessmentId(x.name)+'_'+i,name:x.name,max:x.max}));const total=assessmentTotalMax({categories:cats});if(!cats.length||Math.abs(total-100)>.001){toast(`Assessment maximum must total 100. Current total: ${total}.`,'warn');return;}const obj={courseId:String(cid),categories:cats,updatedAt:new Date().toISOString(),updatedBy:currentActorInfo()};const idx=assessmentConfigs.findIndex(x=>String(x.courseId)===String(cid));if(idx>=0)assessmentConfigs[idx]=obj;else assessmentConfigs.push(obj);saveToStorage();toast(`${cid} assessment scheme saved.`,'ok');if(document.getElementById('at-results')&&(isAdminUser()||isProgramManager()))renderExamResultsManager(cid);else renderTeacherResults(cid);}
 function renderExamResultsManager(preselect){
   const host=document.getElementById('at-results');if(!host)return;const admin=isAdminUser()||isProgramManager(),programs=getResultEntryPrograms(),sp=document.getElementById('resultProgramFilter')?.value||'',ss=document.getElementById('resultStudentNumber')?.value||'',student=findResultStudentByNumber(ss),ids=getResultEntryCourseIds(sp,ss);
-  host.innerHTML=`<div class="sec-hdr"><div><div class="sec-title">Exam Results</div><div class="sec-sub">All courses offered in the active academic session are listed by program. Faculty only see courses they teach. Searching a student narrows the list to that student's enrolled courses.</div></div></div><div class="form-shell" style="margin-bottom:18px"><div style="display:grid;grid-template-columns:repeat(3,minmax(220px,1fr));gap:12px;align-items:end"><div class="fg"><label>Program</label><select id="resultProgramFilter" onchange="renderExamResultsManager('')"><option value="">— All Programs —</option>${programs.map(p=>`<option value="${escHtml(p)}" ${sp===p?'selected':''}>${escHtml(p)}</option>`).join('')}</select></div><div class="fg"><label>Search Student</label><input id="resultStudentNumber" value="${escHtml(ss)}" placeholder="Search by name or student ID…" onkeydown="if(event.key==='Enter')renderExamResultsManager('')" oninput="debouncedResultStudentFilter()"></div><div class="fg"><label>Course</label><select id="resultConfigCourse" onchange="renderExamResultsManager(this.value)"><option value="">— choose course —</option>${ids.map(cid=>{const c=courses.find(x=>_ncid(x.id)===_ncid(cid));return`<option value="${escHtml(cid)}" ${String(preselect||'')===String(cid)?'selected':''}>${escHtml(cid)} — ${escHtml(c?.title||cid)}</option>`}).join('')}</select></div></div><div style="margin-top:10px">${resultStudentMatchHTML(ss)} <button type="button" class="btn btn-dark btn-sm" style="margin-left:8px" onclick="document.getElementById('resultProgramFilter').value='';document.getElementById('resultStudentNumber').value='';renderExamResultsManager('')">Clear</button></div></div><div id="assessmentConfigEditor"></div><div style="margin:18px 0 10px"><div class="sec-title" style="font-size:16px">Courses Offered — ${escHtml(currentSessionLabel())}</div><div class="sec-sub">${ids.length} course(s)${sp?' · '+escHtml(sp):''}${student?' · matching '+escHtml(ss):''}${admin?'':' · teaching assignments only'}</div></div><div class="cards-grid" style="margin-bottom:20px">${ids.length?ids.map(cid=>{const c=courses.find(x=>_ncid(x.id)===_ncid(cid)),os=(academicOffering||[]).filter(o=>offeringCourseCode(o)===_ncid(cid)),pg=[...new Set(os.map(o=>String(o.program||'').trim()).filter(Boolean))],fac=[...new Set(os.map(o=>String(o.faculty||'').trim()).filter(Boolean))];return`<div class="c-card" style="cursor:pointer" onclick="renderExamResultsManager('${escHtml(cid)}')"><div class="c-card-top"><div class="c-code">${escHtml(cid)} · ${c?.credits||0} Cr Hr${(c?.credits||0)==1?'':'s'} · ${courseEnrolledCount(cid)} student(s) enrolled</div><div class="c-title">${escHtml(c?.title||cid)}</div><div class="c-dept">${escHtml(c?.dept||'')}${pg.length?' · Programs: '+escHtml(pg.join(', ')):''}${fac.length?' · Faculty: '+escHtml(fac.join(', ')):''}</div></div><div class="c-footer"><button class="btn btn-amber btn-xs" onclick="event.stopPropagation();renderExamResultsManager('${escHtml(cid)}')">${assessmentConfigs.some(x=>String(x.courseId)===String(cid))?'Edit Schema & Results':'Set Schema & Enter Results'}</button></div></div>`}).join(''):`<div class="empty-state"><div class="empty-ico">📚</div><div class="empty-txt">${(academicOffering||[]).length?'No offered course matches this program / student search.':'No courses are offered yet. Add rows in Academic Offering for '+escHtml(currentSessionLabel())+' first.'}</div></div>`}</div><div id="examResultCourseTable"></div>`;
+  host.innerHTML=`<div class="sec-hdr"><div><div class="sec-title">Exam Results</div><div class="sec-sub">All courses offered in the active academic session are listed by program. Faculty only see courses they teach. Searching a student narrows the list to that student's enrolled courses.<br><strong style="color:#e0a339;">Sessional &amp; Midterm marks are visible to the student the moment you save them. Final results enter the approval workflow only when all enrolled students have complete results: HOD → Dean → Controller of Examination. Sessional and Midterm marks remain visible to the HOD during submission.</strong></div></div></div><div class="form-shell" style="margin-bottom:18px"><div style="display:grid;grid-template-columns:repeat(3,minmax(220px,1fr));gap:12px;align-items:end"><div class="fg"><label>Program</label><select id="resultProgramFilter" onchange="renderExamResultsManager('')"><option value="">— All Programs —</option>${programs.map(p=>`<option value="${escHtml(p)}" ${sp===p?'selected':''}>${escHtml(p)}</option>`).join('')}</select></div><div class="fg"><label>Search Student</label><input id="resultStudentNumber" value="${escHtml(ss)}" placeholder="Search by name or student ID…" onkeydown="if(event.key==='Enter')renderExamResultsManager('')" oninput="debouncedResultStudentFilter()"></div><div class="fg"><label>Course</label><select id="resultConfigCourse" onchange="renderExamResultsManager(this.value)"><option value="">— choose course —</option>${ids.map(cid=>{const c=courses.find(x=>_ncid(x.id)===_ncid(cid));return`<option value="${escHtml(cid)}" ${String(preselect||'')===String(cid)?'selected':''}>${escHtml(cid)} — ${escHtml(c?.title||cid)}</option>`}).join('')}</select></div></div><div style="margin-top:10px">${resultStudentMatchHTML(ss)} <button type="button" class="btn btn-dark btn-sm" style="margin-left:8px" onclick="document.getElementById('resultProgramFilter').value='';document.getElementById('resultStudentNumber').value='';renderExamResultsManager('')">Clear</button></div></div><div id="assessmentConfigEditor"></div><div style="margin:18px 0 10px"><div class="sec-title" style="font-size:16px">Courses Offered — ${escHtml(currentSessionLabel())}</div><div class="sec-sub">${ids.length} course(s)${sp?' · '+escHtml(sp):''}${student?' · matching '+escHtml(ss):''}${admin?'':' · teaching assignments only'}</div></div><div class="cards-grid" style="margin-bottom:20px">${ids.length?ids.map(cid=>{const c=courses.find(x=>_ncid(x.id)===_ncid(cid)),os=(academicOffering||[]).filter(o=>offeringCourseCode(o)===_ncid(cid)),pg=[...new Set(os.map(o=>String(o.program||'').trim()).filter(Boolean))],fac=[...new Set(os.map(o=>String(o.faculty||'').trim()).filter(Boolean))];return`<div class="c-card" style="cursor:pointer" onclick="renderExamResultsManager('${escHtml(cid)}')"><div class="c-card-top"><div class="c-code">${escHtml(cid)} · ${c?.credits||0} Cr Hr${(c?.credits||0)==1?'':'s'} · ${courseEnrolledCount(cid)} student(s) enrolled</div><div class="c-title">${escHtml(c?.title||cid)}</div><div class="c-dept">${escHtml(c?.dept||'')}${pg.length?' · Programs: '+escHtml(pg.join(', ')):''}${fac.length?' · Faculty: '+escHtml(fac.join(', ')):''}</div></div><div class="c-footer"><button class="btn btn-amber btn-xs" onclick="event.stopPropagation();renderExamResultsManager('${escHtml(cid)}')">${assessmentConfigs.some(x=>String(x.courseId)===String(cid))?'Edit Schema & Results':'Set Schema & Enter Results'}</button></div></div>`}).join(''):`<div class="empty-state"><div class="empty-ico">📚</div><div class="empty-txt">${(academicOffering||[]).length?'No offered course matches this program / student search.':'No courses are offered yet. Add rows in Academic Offering for '+escHtml(currentSessionLabel())+' first.'}</div></div>`}</div><div id="examResultCourseTable"></div>`;
   const sel=ids.find(cid=>_ncid(cid)===_ncid(preselect));
   if(sel){renderAssessmentConfigEditor(sel);renderExamResultCourse(sel);document.getElementById('examResultCourseTable')?.scrollIntoView({behavior:'smooth',block:'start'});}
   if(_resultSearchFocused){const el=document.getElementById('resultStudentNumber');if(el){el.focus();try{el.setSelectionRange(el.value.length,el.value.length);}catch(e){}}}
 }
 let _resultStudentFilterTimer=null,_resultSearchFocused=false;function debouncedResultStudentFilter(){_resultSearchFocused=true;clearTimeout(_resultStudentFilterTimer);_resultStudentFilterTimer=setTimeout(()=>renderExamResultsManager(document.getElementById('resultConfigCourse')?.value||''),250);}
-function renderExamResultCourse(cid){if(!cid||!canEditCourseResults(cid))return;const cfg=assessmentConfigForCourse(cid),c=courses.find(x=>_ncid(x.id)===_ncid(cid)),host=document.getElementById('examResultCourseTable');if(!host)return;let rows=[...new Set(activeEnrollmentsFor(cid).map(e=>String(e.studentId)))].map(id=>students.find(s=>String(s.id)===id)).filter(Boolean);const _q=String(document.getElementById('resultStudentNumber')?.value||'').trim().toLowerCase();if(_q){const _m=new Set(matchResultStudents(_q).map(s=>String(s.id)));if(_m.size)rows=rows.filter(s=>_m.has(String(s.id)));}host.innerHTML=rows.length?`<div class="sec-hdr"><div><div class="sec-title" style="font-size:18px">${escHtml(c?.title||cid)} <span class="code-badge">${escHtml(cid)}</span></div><div class="sec-sub">${c?.credits||0} credit hour(s) · ${rows.length} student(s) enrolled</div></div><div style="min-width:240px"><input id="examRosterSearch" placeholder="Search student in this course…" oninput="filterExamRosterRows('examRosterSearch','examResultCourseTable')"></div></div><div class="tbl-wrap" style="overflow-x:auto"><table style="min-width:${720+cfg.categories.length*105}px"><thead><tr><th>#</th><th>Student Name</th><th>Student No.</th><th>Enrollment No.</th>${cfg.categories.map(cat=>`<th>${escHtml(cat.name)}<br><span style="font-size:10px">/${cat.max}</span></th>`).join('')}<th>Total</th><th>Grade</th><th>Status</th><th>Save</th></tr></thead><tbody>${rows.map((s,i)=>{const r=latestExamResult(s.id,cid),v=resultComponentsFor(r,cfg),cal=calculateFlexibleResult(v,cfg);return`<tr><td>${i+1}</td><td><strong>${escHtml((s.firstName||'')+' '+(s.lastName||''))}</strong><br><span style="font-size:10px;color:var(--tx3);">${escHtml(s.program||'')}</span></td><td><span class="code-badge">${escHtml(s.id||'—')}</span></td><td><span class="code-badge">${escHtml(getStudentEnrollmentNo(s.id,cid))}</span></td>${cfg.categories.map(cat=>`<td><input class="exam-mark-input" data-sid="${escHtml(s.id)}" data-cid="${escHtml(cid)}" data-cat="${escHtml(cat.id)}" type="number" min="0" max="${cat.max}" step="0.5" value="${v[cat.id]??''}" style="width:76px" oninput="liveFlexibleRow('${escHtml(s.id)}','${escHtml(cid)}')"></td>`).join('')}<td id="flex_total_${escHtml(s.id)}_${escHtml(cid)}">${r?cal.total:'—'}</td><td id="flex_grade_${escHtml(s.id)}_${escHtml(cid)}">${r?cal.grade:'—'}</td><td id="flex_status_${escHtml(s.id)}_${escHtml(cid)}">${r?cal.status.toUpperCase():'—'}</td><td><button class="btn btn-amber btn-xs" onclick="saveFlexibleStudentResult('${escHtml(s.id)}','${escHtml(cid)}')">Save</button></td></tr>`}).join('')}</tbody></table></div>`:'<div class="empty-state"><div class="empty-txt">No students are enrolled in this course.</div></div>';
+function renderExamResultCourse(cid){if(!cid||!canEditCourseResults(cid))return;const cfg=assessmentConfigForCourse(cid),c=courses.find(x=>_ncid(x.id)===_ncid(cid)),host=document.getElementById('examResultCourseTable');if(!host)return;let rows=[...new Set(activeEnrollmentsFor(cid).map(e=>String(e.studentId)))].map(id=>students.find(s=>String(s.id)===id)).filter(Boolean);const _q=String(document.getElementById('resultStudentNumber')?.value||'').trim().toLowerCase();if(_q){const _m=new Set(matchResultStudents(_q).map(s=>String(s.id)));if(_m.size)rows=rows.filter(s=>_m.has(String(s.id)));}host.innerHTML=rows.length?`<div class="sec-hdr"><div><div class="sec-title" style="font-size:18px">${escHtml(c?.title||cid)} <span class="code-badge">${escHtml(cid)}</span></div><div class="sec-sub">${c?.credits||0} credit hour(s) · ${rows.length} student(s) enrolled</div></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:240px"><input id="examRosterSearch" placeholder="Search student in this course…" oninput="filterExamRosterRows('examRosterSearch','examResultCourseTable')"><button type="button" class="btn btn-dark btn-xs" onclick="downloadResultsTemplate('${escHtml(cid)}')">⇩ Download Excel Template</button><label class="btn btn-sage btn-xs" style="cursor:pointer;">⇧ Upload Marks (.xlsx)<input type="file" accept=".xlsx,.xls,.csv" style="display:none;" onchange="importResultsExcel(this,'${escHtml(cid)}')"/></label></div></div><div class="tbl-wrap" style="overflow-x:auto"><table style="min-width:${720+cfg.categories.length*105}px"><thead><tr><th>#</th><th>Student Name</th><th>Student No.</th><th>Enrollment No.</th>${cfg.categories.map(cat=>`<th>${escHtml(cat.name)}<br><span style="font-size:10px">/${cat.max}</span></th>`).join('')}<th>Total</th><th>Grade</th><th>Status</th><th>Save</th></tr></thead><tbody>${rows.map((s,i)=>{const r=latestExamResult(s.id,cid),v=resultComponentsFor(r,cfg),complete=r&&r.complete,pendingApproval=complete&&!r.approved;return`<tr><td>${i+1}</td><td><strong>${escHtml((s.firstName||'')+' '+(s.lastName||''))}</strong><br><span style="font-size:10px;color:var(--tx3);">${escHtml(s.program||'')}</span></td><td><span class="code-badge">${escHtml(s.id||'—')}</span></td><td><span class="code-badge">${escHtml(getStudentEnrollmentNo(s.id,cid))}</span></td>${cfg.categories.map(cat=>`<td><input class="exam-mark-input" data-sid="${escHtml(s.id)}" data-cid="${escHtml(cid)}" data-cat="${escHtml(cat.id)}" type="number" min="0" max="${cat.max}" step="0.5" value="${v[cat.id]??''}" style="width:76px" oninput="liveFlexibleRow('${escHtml(s.id)}','${escHtml(cid)}')"></td>`).join('')}<td id="flex_total_${escHtml(s.id)}_${escHtml(cid)}">${complete?r.total:'—'}</td><td id="flex_grade_${escHtml(s.id)}_${escHtml(cid)}">${complete?r.grade:'—'}</td><td id="flex_status_${escHtml(s.id)}_${escHtml(cid)}">${pendingApproval?'<span style="color:#e0a339;font-weight:600;">PENDING HOD</span>':complete?String(r.status||'').toUpperCase():(r?'IN PROGRESS':'—')}</td><td><button class="btn btn-amber btn-xs" onclick="saveFlexibleStudentResult('${escHtml(s.id)}','${escHtml(cid)}')">Save</button></td></tr>`}).join('')}</tbody></table></div>`:'<div class="empty-state"><div class="empty-txt">No students are enrolled in this course.</div></div>';
 }
-function liveFlexibleRow(sid,cid){const cfg=assessmentConfigForCourse(cid),v={};cfg.categories.forEach(cat=>{v[cat.id]=Number(document.querySelector(`.exam-mark-input[data-sid="${CSS.escape(String(sid))}"][data-cid="${CSS.escape(String(cid))}"][data-cat="${CSS.escape(String(cat.id))}"]`)?.value)||0;});const cal=calculateFlexibleResult(v,cfg);['total','grade','status'].forEach(k=>{const e=document.getElementById(`flex_${k}_${sid}_${cid}`);if(e)e.textContent=k==='total'?cal.total:(k==='status'?cal.status.toUpperCase():cal.grade);});}
-function saveFlexibleStudentResult(sid,cid){if(!canEditCourseResults(cid))return;const cfg=assessmentConfigForCourse(cid),v={};for(const cat of cfg.categories){const n=Number(document.querySelector(`.exam-mark-input[data-sid="${CSS.escape(String(sid))}"][data-cid="${CSS.escape(String(cid))}"][data-cat="${CSS.escape(String(cat.id))}"]`)?.value);if(!Number.isFinite(n)||n<0||n>Number(cat.max)){toast(`${cat.name} must be between 0 and ${cat.max}.`,'warn');return;}v[cat.id]=n;}const cal=calculateFlexibleResult(v,cfg),result={studentId:sid,courseId:cid,components:v,assessments:cfg.categories.map(cat=>({id:cat.id,name:cat.name,max:cat.max,marks:v[cat.id]})),sessional:v.sessional??0,midterm:v.midterm??0,final:v.final??0,total:cal.total,grade:cal.grade,gp:cal.gp,status:cal.status,date:new Date().toLocaleDateString(),term:currentSessionLabel(),postedBy:currentActorInfo()};const ms=examResults.map((r,i)=>({r,i})).filter(x=>String(x.r.studentId)===String(sid)&&String(x.r.courseId)===String(cid)),last=ms[ms.length-1];if(last&&last.r.status==='pass')examResults[last.i]=result;else examResults.push(result);if(cal.status==='pass'){const ei=enrollments.findIndex(e=>String(e.studentId)===String(sid)&&String(e.courseId)===String(cid)&&e.status==='active');if(ei>-1)enrollments[ei].status='completed';}else if(typeof dropBlockedCourses==='function')dropBlockedCourses(sid,cid);saveToStorage();if(typeof refreshAll==='function')refreshAll(sid);renderExamResultsManager(cid);toast(`${sid} — ${cid} result saved.`,'ok');}
+function liveFlexibleRow(sid,cid){
+  const cfg=assessmentConfigForCourse(cid),v={};let hasAny=false;
+  cfg.categories.forEach(cat=>{const raw=document.querySelector(`.exam-mark-input[data-sid="${CSS.escape(String(sid))}"][data-cid="${CSS.escape(String(cid))}"][data-cat="${CSS.escape(String(cat.id))}"]`)?.value;if(raw===''||raw===undefined)return;v[cat.id]=Number(raw);hasAny=true;});
+  const complete=isResultComplete(v,cfg),cal=complete?calculateFlexibleResult(v,cfg):null;
+  const te=document.getElementById(`flex_total_${sid}_${cid}`),ge=document.getElementById(`flex_grade_${sid}_${cid}`),se=document.getElementById(`flex_status_${sid}_${cid}`);
+  if(te)te.textContent=complete?cal.total:(hasAny?'—':'—');
+  if(ge)ge.textContent=complete?cal.grade:'—';
+  if(se)se.textContent=complete?cal.status.toUpperCase():(hasAny?'IN PROGRESS':'—');
+}
+function saveFlexibleStudentResult(sid,cid){
+  if(!canEditCourseResults(cid))return;
+  const cfg=assessmentConfigForCourse(cid),v={};
+  for(const cat of cfg.categories){
+    const el=document.querySelector(`.exam-mark-input[data-sid="${CSS.escape(String(sid))}"][data-cid="${CSS.escape(String(cid))}"][data-cat="${CSS.escape(String(cat.id))}"]`);
+    const raw=el?.value;
+    if(raw===''||raw===undefined||raw===null)continue;
+    const n=Number(raw);
+    if(!Number.isFinite(n)||n<0||n>Number(cat.max)){toast(`${cat.name} must be between 0 and ${cat.max}.`,'warn');return;}
+    v[cat.id]=Math.round(n*10)/10;
+  }
+  if(!Object.keys(v).length){toast('Enter at least one mark before saving.','warn');return;}
+  const {complete}=commitExamResult(sid,cid,v,cfg);
+  saveToStorage();if(typeof refreshAll==='function')refreshAll(sid);renderExamResultsManager(cid);
+  toast(complete?`${sid} — ${cid} final result saved; course approval is enabled after all enrolled students are complete.`:`${sid} — ${cid} marks saved. Visible to the student now.`,complete?'warn':'ok');
+}
+
+/* ---- Bulk marks via Excel: download a roster template, then re-upload it with marks filled in ---- */
+function resultsRosterFor(cid){
+  const enrolled=enrollments.filter(e=>String(e.courseId)===String(cid)&&(e.status==='active'||e.status==='completed'));
+  return [...new Set(enrolled.map(e=>String(e.studentId)))].map(id=>students.find(s=>String(s.id)===id)).filter(Boolean);
+}
+function downloadResultsTemplate(cid){
+  if(!cid){toast('Choose a course first.','warn');return;}
+  if(!canEditCourseResults(cid)){toast('This course is not assigned to you.','err');return;}
+  const cfg=assessmentConfigForCourse(cid);
+  if(!cfg.categories||!cfg.categories.length){toast('Set the assessment schema (categories) before downloading a template.','warn');return;}
+  const rows=resultsRosterFor(cid);
+  if(!rows.length){toast('No students are enrolled in this course yet.','warn');return;}
+  const hasSessional=(cfg.categories||[]).some(cat=>_isSessionalCat(cat.name));
+  const subHeaders=hasSessional?SESSIONAL_SUBMARKS.map(([k,l,m])=>l+' /'+m):[];
+  const headers=['StudentID','StudentName',...subHeaders,...cfg.categories.map(c=>c.name)];
+  const data=rows.map(s=>{
+    const r=latestExamResult(s.id,cid),vals=resultComponentsFor(r,cfg);
+    const row={StudentID:s.id,StudentName:((s.firstName||'')+' '+(s.lastName||'')).trim()};
+    subHeaders.forEach((h,i)=>{row[h]=(r&&r.sessionalSubmarks)?(r.sessionalSubmarks[SESSIONAL_SUBMARKS[i][0]]??''):'';});
+    cfg.categories.forEach(cat=>{row[cat.name]=vals[cat.id]??'';});
+    return row;
+  });
+  downloadXLSX(headers,data,`Results_Template_${cid}_${new Date().toLocaleDateString().replace(/\//g,'-')}.xlsx`);
+  toast(`Template downloaded for ${cid}. Fill in the marks columns and re-upload.`,'ok');
+}
+function importResultsExcel(input,cid){
+  if(!cid){toast('Choose a course first.','warn');input.value='';return;}
+  if(!canEditCourseResults(cid)){toast('This course is not assigned to you.','err');input.value='';return;}
+  const file=input.files&&input.files[0];if(!file)return;
+  if(typeof XLSX==='undefined'){toast('Excel reader is unavailable.','err');input.value='';return;}
+  const cfg=assessmentConfigForCourse(cid);
+  if(!cfg.categories||!cfg.categories.length){toast('Set the assessment schema (categories) before uploading marks.','warn');input.value='';return;}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:false});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rawRows=XLSX.utils.sheet_to_json(ws,{defval:'',raw:true});
+      if(!rawRows.length){toast('No rows found in the uploaded file.','err');input.value='';return;}
+      const norm=h=>String(h||'').toLowerCase().replace(/max\s*\d+(\.\d+)?/g,'').replace(/\/\s*\d+(\.\d+)?/g,'').replace(/[^a-z0-9]+/g,'');
+      const catByHeader={};cfg.categories.forEach(cat=>{catByHeader[norm(cat.name)]=cat;});
+      const CAT_ALIASES={sessional:['sessional','sessionaltotal','s'],midterm:['midterm','mid','m'],final:['final','finalexam','f'],quiz:['quiz','quizzes'],assignment:['assignment','assignments'],presentation:['presentation','presentations'],participation:['participation','attendance','classparticipation']};
+      (cfg.categories||[]).forEach(cat=>{const base=norm(cat.name);(CAT_ALIASES[base]||[]).forEach(a=>{if(!catByHeader[a])catByHeader[a]=cat;});});
+      const sessionalCat=(cfg.categories||[]).find(cat=>_isSessionalCat(cat.name));
+      const subByHeader={};if(sessionalCat)SESSIONAL_SUBMARKS.forEach(([k,label,max])=>{[norm(label),...(CAT_ALIASES[k]||[])].forEach(a=>{subByHeader[a]={key:k,name:label,max:max};});});
+      let updated=0,skipped=0;const errors=[];
+      rawRows.forEach((row,idx)=>{
+        let sidKey=Object.keys(row).find(k=>norm(k)==='studentid'||norm(k)==='student id'||norm(k)==='student no.'||norm(k)==='student no');
+        const sid=String(sidKey?row[sidKey]:'').trim();
+        if(!sid){skipped++;return;}
+        const student=students.find(s=>String(s.id).trim().toLowerCase()===sid.toLowerCase());
+        if(!student){errors.push(`Row ${idx+2}: student ID "${sid}" not found.`);skipped++;return;}
+        const enrolledHere=enrollments.some(en=>String(en.studentId)===String(student.id)&&String(en.courseId)===String(cid)&&(en.status==='active'||en.status==='completed'));
+        if(!enrolledHere){errors.push(`Row ${idx+2}: ${student.id} is not enrolled in ${cid}.`);skipped++;return;}
+        const existing=latestExamResult(student.id,cid),existingVals=resultComponentsFor(existing,cfg);
+        const vals={};let rowValid=true;const subs={};
+        for(const key in row){
+          if(sidKey&&key===sidKey)continue;
+          const sub=subByHeader[norm(key)];
+          if(sub&&!catByHeader[norm(key)]){
+            const rawSub=row[key];
+            if(rawSub===''||rawSub===null||rawSub===undefined)continue;
+            const ns=Number(rawSub);
+            if(!Number.isFinite(ns)||ns<0||ns>sub.max){errors.push(`Row ${idx+2} (${student.id}): "${sub.name}" must be between 0 and ${sub.max}.`);rowValid=false;break;}
+            subs[sub.key]=Math.round(ns*10)/10;
+            continue;
+          }
+          const cat=catByHeader[norm(key)];if(!cat)continue;
+          const raw=row[key];
+          if(raw===''||raw===null||raw===undefined)continue;
+          const n=Number(raw);
+          if(!Number.isFinite(n)||n<0||n>Number(cat.max)){errors.push(`Row ${idx+2} (${student.id}): "${cat.name}" must be between 0 and ${cat.max}.`);rowValid=false;break;}
+          vals[cat.id]=Math.round(n*10)/10;
+        }
+        if(!rowValid){skipped++;return;}
+        /* Sessional sub-sections (Quiz / Assignment / Presentation / Participation) add up to the Sessional total */
+        let submarks=Object.keys(subs).length?subs:((existing&&existing.sessionalSubmarks)||{});
+        if(sessionalCat&&Object.keys(subs).length){
+          const sum=Math.round(SESSIONAL_SUBMARKS.reduce((a,[k])=>a+(Number.isFinite(Number(subs[k]))?Number(subs[k]):0),0)*10)/10;
+          vals[sessionalCat.id]=Math.min(Number(sessionalCat.max)||sum,sum);
+        }
+        cfg.categories.forEach(cat=>{if(!(cat.id in vals)&&existingVals[cat.id]!==undefined)vals[cat.id]=existingVals[cat.id];});
+        commitExamResult(student.id,cid,vals,cfg,{sessionalSubmarks:submarks});
+        updated++;
+      });
+      saveToStorage();
+      if(typeof refreshAll==='function')refreshAll();
+      if(document.getElementById('page-teacher-results')&&currentUser&&currentUser.role==='teacher')renderTeacherCourseResults(cid);
+      if(document.getElementById('at-results')&&(isAdminUser()||isProgramManager()))renderExamResultCourse(cid);
+      let msg=`${updated} result(s) uploaded for ${cid}. Complete rows are held for the HOD workflow once all enrolled students are complete; partial Sessional/Midterm rows are visible to the HOD immediately.`;if(skipped)msg+=` ${skipped} row(s) skipped.`;
+      toast(msg,errors.length?'warn':'ok');
+      if(errors.length)console.warn('Result upload issues for '+cid+':',errors);
+    }catch(err){console.error(err);toast('Could not read the uploaded file. Make sure it matches the downloaded template format.','err');}
+    input.value='';
+  };
+  reader.readAsArrayBuffer(file);
+}
 
 function renderTeacherResults(preselect){
   ensureEnrollmentNumbers();
@@ -10788,7 +11330,7 @@ function renderTeacherResults(preselect){
      current/completed enrollments. */
   const effectiveProgram=student&&!selectedProgram?String(student.program||''):selectedProgram;
   const ids=getResultEntryCourseIds(effectiveProgram,selectedStudent);
-  el.innerHTML=`<div class="page-inner"><div class="sec-hdr"><div><div class="sec-title">Exam Results</div><div class="sec-sub">Program-wise course list. Only courses you are teaching and that are offered in the active academic session are available. Searching a student by name or ID limits the list to that student's enrolled courses.</div></div></div>
+  el.innerHTML=`<div class="page-inner"><div class="sec-hdr"><div><div class="sec-title">Exam Results</div><div class="sec-sub">Program-wise course list. Only courses you are teaching and that are offered in the active academic session are available. Searching a student by name or ID limits the list to that student's enrolled courses.<br><strong style="color:#e0a339;">Sessional &amp; Midterm marks are visible to the student the moment you save them. Once all required marks are entered for every enrolled student, the course enters the approval workflow: HOD → Dean → Controller of Examination. Sessional and Midterm marks are visible to the HOD immediately.</strong></div></div></div>
     <div class="form-shell"><div style="display:grid;grid-template-columns:minmax(220px,1fr) minmax(220px,1fr) minmax(220px,1fr);gap:12px;align-items:end;">
       <div class="fg"><label>Program</label><select id="trProgram" onchange="renderTeacherResults('')"><option value="">— All Programs —</option>${programs.map(p=>`<option value="${escHtml(p)}" ${String(selectedProgram)===String(p)?'selected':''}>${escHtml(p)}</option>`).join('')}</select></div>
       <div class="fg"><label>Search Student</label><input id="trStudentNumber" value="${escHtml(selectedStudent)}" placeholder="Search by name or student ID…" oninput="debouncedTeacherStudentFilter()" onkeydown="if(event.key==='Enter')renderTeacherResults('')"/></div>
@@ -10811,24 +11353,38 @@ function renderTeacherCourseResults(cid){
   const cfg=assessmentConfigForCourse(cid), c=courses.find(x=>String(x.id)===String(cid)), wrap=document.getElementById('teacherExamCourseWrap');if(!wrap)return;
   const enrolled=enrollments.filter(e=>String(e.courseId)===String(cid)&&(e.status==='active'||e.status==='completed'));
   const rows=[...new Set(enrolled.map(e=>String(e.studentId)))].map(id=>students.find(s=>String(s.id)===id)).filter(Boolean);
-  wrap.innerHTML=`<div class="sec-hdr"><div><div class="sec-title">${escHtml(c?.title||cid)} <span class="code-badge">${escHtml(cid)}</span></div><div class="sec-sub">${c?.credits||0} credit hour(s) · ${rows.length} enrolled student(s). Faculty can enter or edit marks only for this assigned course.</div></div><div style="min-width:240px"><input id="teacherExamSearch" placeholder="Search student in this course…" oninput="filterTeacherExamStudents()"></div></div>
+  wrap.innerHTML=`<div class="sec-hdr"><div><div class="sec-title">${escHtml(c?.title||cid)} <span class="code-badge">${escHtml(cid)}</span></div><div class="sec-sub">${c?.credits||0} credit hour(s) · ${rows.length} enrolled student(s). Faculty can enter or edit marks only for this assigned course.</div></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:240px"><input id="teacherExamSearch" placeholder="Search student in this course…" oninput="filterTeacherExamStudents()"><button type="button" class="btn btn-dark btn-xs" onclick="downloadResultsTemplate('${escHtml(cid)}')">⇩ Download Excel Template</button><label class="btn btn-sage btn-xs" style="cursor:pointer;">⇧ Upload Marks (.xlsx)<input type="file" accept=".xlsx,.xls,.csv" style="display:none;" onchange="importResultsExcel(this,'${escHtml(cid)}')"/></label></div></div>
     <div id="teacherAssessmentConfigEditor"></div>
     <div class="tbl-wrap" style="overflow-x:auto;"><table style="min-width:${720+cfg.categories.length*105}px;"><thead><tr><th>#</th><th>Student</th>${cfg.categories.map(cat=>`<th>${escHtml(cat.name)}<br><span style="font-size:10px;color:var(--tx3);">/${cat.max}</span></th>`).join('')}<th>Total</th><th>Grade</th><th>Status</th><th>Save</th></tr></thead><tbody>
-    ${rows.map((s,i)=>{const r=latestExamResult(s.id,cid),vals=resultComponentsFor(r,cfg),calc=calculateFlexibleResult(vals,cfg);return `<tr><td>${i+1}</td><td><strong>${escHtml(s.firstName+' '+s.lastName)}</strong><br><span class="code-badge">${escHtml(s.id)}</span></td>${cfg.categories.map(cat=>`<td><input class="teacher-exam-input" data-sid="${escHtml(s.id)}" data-cid="${escHtml(cid)}" data-cat="${escHtml(cat.id)}" type="number" min="0" max="${cat.max}" step="0.5" value="${vals[cat.id]??''}" style="width:76px;" oninput="liveTeacherFlexibleRow('${escHtml(s.id)}','${escHtml(cid)}')"/></td>`).join('')}<td id="tf_total_${escHtml(s.id)}_${escHtml(cid)}">${r?calc.total:'—'}</td><td id="tf_grade_${escHtml(s.id)}_${escHtml(cid)}">${r?calc.grade:'—'}</td><td id="tf_status_${escHtml(s.id)}_${escHtml(cid)}">${r?calc.status.toUpperCase():'—'}</td><td><button class="btn btn-amber btn-xs" onclick="teacherSaveFlexibleResult('${escHtml(s.id)}','${escHtml(cid)}')">Save</button></td></tr>`}).join('')}</tbody></table></div>`;
+    ${rows.map((s,i)=>{const r=latestExamResult(s.id,cid),vals=resultComponentsFor(r,cfg),complete=r&&r.complete,pendingApproval=complete&&!r.approved;return `<tr><td>${i+1}</td><td><strong>${escHtml(s.firstName+' '+s.lastName)}</strong><br><span class="code-badge">${escHtml(s.id)}</span></td>${cfg.categories.map(cat=>`<td><input class="teacher-exam-input" data-sid="${escHtml(s.id)}" data-cid="${escHtml(cid)}" data-cat="${escHtml(cat.id)}" type="number" min="0" max="${cat.max}" step="0.5" value="${vals[cat.id]??''}" style="width:76px;" oninput="liveTeacherFlexibleRow('${escHtml(s.id)}','${escHtml(cid)}')"/></td>`).join('')}<td id="tf_total_${escHtml(s.id)}_${escHtml(cid)}">${complete?r.total:'—'}</td><td id="tf_grade_${escHtml(s.id)}_${escHtml(cid)}" style="color:${complete?(r.gp>=1?'#7ecbb8':'#e87c6e'):'var(--tx3)'};">${complete?r.grade:'—'}</td><td id="tf_status_${escHtml(s.id)}_${escHtml(cid)}" style="color:${pendingApproval?'#e0a339':complete?(r.gp>=1?'#7ecbb8':'#e87c6e'):'var(--tx3)'};">${pendingApproval?'PENDING HOD':complete?String(r.status||'').toUpperCase():(r?'IN PROGRESS':'—')}</td><td><button class="btn btn-amber btn-xs" onclick="teacherSaveFlexibleResult('${escHtml(s.id)}','${escHtml(cid)}')">Save</button></td></tr>`}).join('')}</tbody></table></div>`;
   renderAssessmentConfigEditor(cid,'teacherAssessmentConfigEditor');
   filterTeacherExamStudents();
   wrap.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function liveTeacherFlexibleRow(sid,cid){
-  const cfg=assessmentConfigForCourse(cid),vals={};cfg.categories.forEach(cat=>{const el=document.querySelector(`.teacher-exam-input[data-sid="${CSS.escape(String(sid))}"][data-cid="${CSS.escape(String(cid))}"][data-cat="${CSS.escape(String(cat.id))}"]`);vals[cat.id]=Number(el?.value)||0;});const calc=calculateFlexibleResult(vals,cfg);const te=document.getElementById(`tf_total_${sid}_${cid}`),ge=document.getElementById(`tf_grade_${sid}_${cid}`),se=document.getElementById(`tf_status_${sid}_${cid}`);if(te)te.textContent=calc.total; if(ge){ge.textContent=calc.grade;ge.style.color=calc.gp>=1?'#7ecbb8':'#e87c6e';}if(se){se.textContent=calc.status.toUpperCase();se.style.color=calc.gp>=1?'#7ecbb8':'#e87c6e';}}
+  const cfg=assessmentConfigForCourse(cid),vals={};let hasAny=false;
+  cfg.categories.forEach(cat=>{const el=document.querySelector(`.teacher-exam-input[data-sid="${CSS.escape(String(sid))}"][data-cid="${CSS.escape(String(cid))}"][data-cat="${CSS.escape(String(cat.id))}"]`);const raw=el?.value;if(raw===''||raw===undefined)return;vals[cat.id]=Number(raw);hasAny=true;});
+  const complete=isResultComplete(vals,cfg),calc=complete?calculateFlexibleResult(vals,cfg):null;
+  const te=document.getElementById(`tf_total_${sid}_${cid}`),ge=document.getElementById(`tf_grade_${sid}_${cid}`),se=document.getElementById(`tf_status_${sid}_${cid}`);
+  if(te)te.textContent=complete?calc.total:'—';
+  if(ge){ge.textContent=complete?calc.grade:'—';ge.style.color=complete?(calc.gp>=1?'#7ecbb8':'#e87c6e'):'var(--tx3)';}
+  if(se){se.textContent=complete?calc.status.toUpperCase():(hasAny?'IN PROGRESS':'—');se.style.color=complete?(calc.gp>=1?'#7ecbb8':'#e87c6e'):'var(--tx3)';}
+}
 function teacherSaveFlexibleResult(sid,cid){
   if(!canEditCourseResults(cid)){toast('This course is not assigned to you.','err');return;}
-  const cfg=assessmentConfigForCourse(cid),vals={};for(const cat of cfg.categories){const el=document.querySelector(`.teacher-exam-input[data-sid="${CSS.escape(String(sid))}"][data-cid="${CSS.escape(String(cid))}"][data-cat="${CSS.escape(String(cat.id))}"]`);const v=Number(el?.value);if(!Number.isFinite(v)||v<0||v>Number(cat.max)){toast(`${cat.name} must be between 0 and ${cat.max}.`,'warn');return;}vals[cat.id]=Math.round(v*10)/10;}
-  const calc=calculateFlexibleResult(vals,cfg),result={studentId:sid,courseId:cid,components:vals,assessments:cfg.categories.map(cat=>({id:cat.id,name:cat.name,max:cat.max,marks:vals[cat.id]})),sessional:vals.sessional??0,midterm:vals.midterm??0,final:vals.final??0,total:calc.total,grade:calc.grade,gp:calc.gp,status:calc.status,date:new Date().toLocaleDateString(),term:currentSessionLabel(),postedBy:currentActorInfo()};
-  const matches=examResults.map((r,i)=>({r,i})).filter(x=>String(x.r.studentId)===String(sid)&&String(x.r.courseId)===String(cid));const latest=matches[matches.length-1];if(latest&&latest.r.status==='pass')examResults[latest.i]=result;else examResults.push(result);
-  if(calc.status==='pass'){const idx=enrollments.findIndex(e=>String(e.studentId)===String(sid)&&String(e.courseId)===String(cid)&&e.status==='active');if(idx>-1){enrollments[idx].status='completed';const cc=courses.find(x=>String(x.id)===String(cid));if(cc)cc.enrolled=Math.max(0,(cc.enrolled||0)-1);}}
-  else dropBlockedCourses(sid,cid);
-  saveToStorage();refreshAll(sid);renderTeacherResults(cid);toast(`${cid} result saved for ${sid}: ${calc.grade} (${calc.total}/100).`,calc.status==='pass'?'ok':'err');
+  const cfg=assessmentConfigForCourse(cid),vals={};
+  for(const cat of cfg.categories){
+    const el=document.querySelector(`.teacher-exam-input[data-sid="${CSS.escape(String(sid))}"][data-cid="${CSS.escape(String(cid))}"][data-cat="${CSS.escape(String(cat.id))}"]`);
+    const raw=el?.value;
+    if(raw===''||raw===undefined||raw===null)continue;
+    const v=Number(raw);
+    if(!Number.isFinite(v)||v<0||v>Number(cat.max)){toast(`${cat.name} must be between 0 and ${cat.max}.`,'warn');return;}
+    vals[cat.id]=Math.round(v*10)/10;
+  }
+  if(!Object.keys(vals).length){toast('Enter at least one mark before saving.','warn');return;}
+  const {complete,calc}=commitExamResult(sid,cid,vals,cfg);
+  saveToStorage();refreshAll(sid);renderTeacherResults(cid);
+  toast(complete?`${cid} final result submitted for ${sid} — held for HOD approval after all enrolled students are complete.`:`${cid} marks saved for ${sid}. Visible to the student now.`,complete?'warn':'ok');
 }
 
 // Make the faculty course/result page follow the live assignment map.
@@ -10836,5 +11392,585 @@ const _originalTeacherDash=renderTeacherDash;
 function renderTeacherDash(){_originalTeacherDash();}
 
 </script>
-</body>
+\n<script id="dsu-result-enhancements-js">
+// ══════════════════════════════════════════════════════════════════════════════
+// DSU RESULT ENHANCEMENTS — additive/backward-compatible patch
+// Keeps the existing persistence, cloud sync and approval pipeline intact.
+// ══════════════════════════════════════════════════════════════════════════════
+const DSU_RESULT_GRADE_SCALE=[
+  {min:86,grade:'A',gp:4.00},{min:80,grade:'A-',gp:3.67},{min:76,grade:'B+',gp:3.33},
+  {min:72,grade:'B',gp:3.00},{min:68,grade:'B-',gp:2.67},{min:64,grade:'C+',gp:2.50},
+  {min:60,grade:'C',gp:2.00},{min:57,grade:'C-',gp:1.67},{min:54,grade:'D+',gp:1.33},
+  {min:50,grade:'D',gp:1.00},{min:0,grade:'F',gp:0.00}
+];
+const DSU_SPECIAL_RESULT_STATUSES=[
+  {value:'',label:'Normal / Marks'},
+  {value:'I',label:'I — Incomplete'},
+  {value:'W',label:'W — Withdrawn'},
+  {value:'F-SAT',label:'F-SAT — Attendance'}
+];
+const DSU_SESSIONAL_SUBMARKS=[['quiz','Quiz',10],['assignment','Assignment',10],['presentation','Presentation',10],['participation','Participation',10]];
+
+// The shared calcGrade function is intentionally redirected to the supplied DSU
+// absolute grading table. Existing callers continue to work unchanged.
+function calcGrade(total){
+  const m=Math.max(0,Math.min(100,Number(total)||0));
+  return DSU_RESULT_GRADE_SCALE.find(g=>m>=g.min)||DSU_RESULT_GRADE_SCALE[DSU_RESULT_GRADE_SCALE.length-1];
+}
+function dsuSpecialLabel(v){return DSU_SPECIAL_RESULT_STATUSES.find(x=>x.value===String(v||''))?.label||'Normal / Marks';}
+function dsuSpecialStatus(r){return String(r?.specialGrade||'').trim().toUpperCase();}
+function dsuStatusOptions(selected){
+  return DSU_SPECIAL_RESULT_STATUSES.map(x=>`<option value="${x.value}" ${String(selected||'')===x.value?'selected':''}>${x.label}</option>`).join('');
+}
+function dsuSessionalValues(r){
+  const src=(r&&r.sessionalSubmarks)||{};
+  const out={};
+  DSU_SESSIONAL_SUBMARKS.forEach(([k])=>{
+    const n=Number(src[k]); if(Number.isFinite(n))out[k]=n;
+  });
+  return out;
+}
+function dsuSessionalTotalFromValues(values){
+  return Math.round(DSU_SESSIONAL_SUBMARKS.reduce((a,[k,,max])=>{const n=Number(values?.[k]);return a+(Number.isFinite(n)?Math.max(0,Math.min(max,n)):0);},0)*10)/10;
+}
+function dsuHasCompleteSessionalSubmarks(values){return DSU_SESSIONAL_SUBMARKS.every(([k])=>Number.isFinite(Number(values?.[k])));}
+function dsuResultSpecial(status){return ['I','W','F-SAT'].includes(String(status||'').toUpperCase());}
+function dsuCalculateResult(values,cfg,special){
+  const sp=String(special||'').toUpperCase();
+  if(sp==='I')return {total:null,grade:'I',gp:null,status:'incomplete'};
+  if(sp==='W')return {total:null,grade:'W',gp:null,status:'withdrawn'};
+  if(sp==='F-SAT'){
+    let total=0;(cfg.categories||[]).forEach(cat=>{const n=Number(values?.[cat.id]);if(Number.isFinite(n))total+=Math.max(0,Math.min(Number(cat.max)||0,n));});
+    return {total:Math.round(total*10)/10,grade:'F-SAT',gp:0,status:'fail'};
+  }
+  let total=0;(cfg.categories||[]).forEach(cat=>{const n=Number(values?.[cat.id]);if(Number.isFinite(n))total+=Math.max(0,Math.min(Number(cat.max)||0,n));});
+  total=Math.round(total*10)/10;const g=calcGrade(total);
+  return {total,grade:g.grade,gp:g.gp,status:g.gp>=1?'pass':'fail'};
+}
+function dsuBuildResult(sid,cid,vals,cfg,special,submarks,old){
+  const sp=String(special||'').toUpperCase();
+  const complete=dsuResultSpecial(sp)?true:isResultComplete(vals,cfg);
+  const calc=complete?dsuCalculateResult(vals,cfg,sp):null;
+  const sessionalCat=(cfg.categories||[]).find(c=>_isSessionalCat(c.name)||String(c.id).toLowerCase()==='sessional');
+  const sessionalValue=sessionalCat&&vals[sessionalCat.id]!==undefined?vals[sessionalCat.id]:vals.sessional;
+  const result={
+    studentId:String(sid),courseId:String(cid),components:{...vals},
+    assessments:(cfg.categories||[]).map(cat=>({id:cat.id,name:cat.name,max:cat.max,marks:vals[cat.id]})),
+    sessional:vals.sessional,sessionalSubmarks:Object.keys(submarks||{}).length?{...submarks}:undefined,
+    midterm:vals.midterm,final:vals.final,complete,
+    total:calc?.total,grade:calc?.grade,gp:calc?.gp,status:calc?.status||'pending',
+    specialGrade:sp||'',specialReason:sp==='F-SAT'?'Fail — Shortage of Attendance':(sp==='I'?'Incomplete':(sp==='W'?'Withdrawn':'')),
+    approved:false,hodApproved:false,deanApproved:false,controllerApproved:false,
+    date:new Date().toLocaleDateString(),term:currentSessionLabel(),postedBy:currentActorInfo()
+  };
+  if(old){
+    result.previousApprovalState={hodApproved:!!old.hodApproved,deanApproved:!!old.deanApproved,controllerApproved:!!old.controllerApproved};
+  }
+  return {complete,calc,result};
+}
+function dsuFindResultIndex(sid,cid){
+  for(let i=examResults.length-1;i>=0;i--){if(String(examResults[i].studentId)===String(sid)&&_ncid(examResults[i].courseId)===_ncid(cid))return i;}
+  return -1;
+}
+function dsuReadRowMarks(row,cid,cfg,existing){
+  const norm=v=>String(v??'').trim().toLowerCase().replace(/max\s*\d+(?:\.\d+)?/g,'').replace(/\/\s*\d+(?:\.\d+)?/g,'').replace(/[^a-z0-9]+/g,'');
+  const keys=Object.keys(row);
+  const findKey=aliases=>{const a=aliases.map(norm);return keys.find(k=>a.includes(norm(k)));};
+  const sidKey=findKey(['StudentID','Student Id','Student No','Student Number','Enrollment No']);
+  const sid=String(sidKey?row[sidKey]:'').trim();
+  const statusKey=findKey(['Special Grade','Result Status','Special Status','Grade','Status','Remarks']);
+  const rawStatus=String(statusKey?row[statusKey]:'').trim().toUpperCase();
+  const special=['I','W','F-SAT'].includes(rawStatus)?rawStatus:'';
+  const aliases={
+    sessional:['sessional','sessionaltotal','s'],midterm:['midterm','midtermexam','mid','m'],final:['final','finalexam','f'],
+    quiz:['quiz','quizzes','quiz10'],assignment:['assignment','assignments','assignment10'],
+    presentation:['presentation','presentations','presentation10'],participation:['participation','attendance','classparticipation','participation10']
+  };
+  const values={};const subs={};
+  (cfg.categories||[]).forEach(cat=>{
+    const base=String(cat.id||'').toLowerCase(), name=String(cat.name||'').toLowerCase();
+    const k=findKey([cat.name,cat.id,...(aliases[base]||[]),...(aliases[norm(name)]||[])]);
+    if(!k)return;const raw=row[k];if(raw===''||raw===null||raw===undefined)return;
+    const n=Number(raw);if(!Number.isFinite(n)||n<0||n>Number(cat.max))throw new Error(`${sid||'row'}: ${cat.name} must be between 0 and ${cat.max}.`);
+    values[cat.id]=Math.round(n*10)/10;
+  });
+  DSU_SESSIONAL_SUBMARKS.forEach(([key,label,max])=>{
+    const k=findKey([label,key,label+' /'+max,label+' '+max]);if(!k)return;const raw=row[k];
+    if(raw===''||raw===null||raw===undefined)return;const n=Number(raw);
+    if(!Number.isFinite(n)||n<0||n>max)throw new Error(`${sid||'row'}: ${label} must be between 0 and ${max}.`);
+    subs[key]=Math.round(n*10)/10;
+  });
+  const sessionalCat=(cfg.categories||[]).find(c=>_isSessionalCat(c.name)||String(c.id).toLowerCase()==='sessional');
+  if(sessionalCat&&Object.keys(subs).length){values[sessionalCat.id]=dsuSessionalTotalFromValues(subs);}
+  // Backward compatibility: if no sub-marks were supplied, keep the existing
+  // sessional total from the workbook/result record when available.
+  if(sessionalCat&&values[sessionalCat.id]===undefined&&existing?.sessional!==undefined)values[sessionalCat.id]=Number(existing.sessional);
+  return {sid,values,subs,special,statusKey};
+}
+
+// Excel import: accepts the actual filled workbook, tolerates sheet/header variations,
+// preserves partial marks, and saves through the existing commit/persistence path.
+function importResultsExcel(input,cid){
+  if(!cid){toast('Choose a course first.','warn');if(input)input.value='';return;}
+  if(!canEditCourseResults(cid)){toast('This course is not assigned to you.','err');if(input)input.value='';return;}
+  const file=input?.files?.[0];if(!file)return;
+  if(typeof XLSX==='undefined'){toast('Excel reader is unavailable.','err');input.value='';return;}
+  const cfg=assessmentConfigForCourse(cid);
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:false,raw:true});
+      const preferred=wb.SheetNames.find(n=>/result|exam|mark|grade/i.test(n));
+      const ws=wb.Sheets[preferred||wb.SheetNames[0]];
+      if(!ws)throw new Error('No worksheet found in the uploaded Excel file.');
+      const rawRows=XLSX.utils.sheet_to_json(ws,{defval:'',raw:true});
+      if(!rawRows.length)throw new Error('The uploaded Excel sheet has no data rows.');
+      let updated=0,skipped=0;const errors=[];
+      rawRows.forEach((row,idx)=>{
+        try{
+          const parsed=dsuReadRowMarks(row,cid,cfg,null);
+          if(!parsed.sid){skipped++;return;}
+          const student=students.find(s=>String(s.id).trim().toLowerCase()===parsed.sid.toLowerCase());
+          if(!student){errors.push(`Row ${idx+2}: student ID "${parsed.sid}" not found.`);skipped++;return;}
+          const enrolled=enrollments.some(en=>String(en.studentId)===String(student.id)&&_ncid(en.courseId)===_ncid(cid)&&(en.status==='active'||en.status==='completed'));
+          if(!enrolled){errors.push(`Row ${idx+2}: ${student.id} is not enrolled in ${cid}.`);skipped++;return;}
+          const old=latestExamResult(student.id,cid);
+          if(old?.approved){errors.push(`Row ${idx+2}: ${student.id} already has an official approved result; upload cannot overwrite it.`);skipped++;return;}
+          // Merge workbook values with the existing partial row so Sessional, Midterm
+          // and Final can be uploaded in stages without erasing earlier marks.
+          const oldVals=resultComponentsFor(old,cfg);
+          const vals={...oldVals,...parsed.values};
+          const subs=Object.keys(parsed.subs).length?{...dsuSessionalValues(old),...parsed.subs}:dsuSessionalValues(old);
+          const sessionalCat=(cfg.categories||[]).find(c=>_isSessionalCat(c.name)||String(c.id).toLowerCase()==='sessional');
+          if(sessionalCat&&Object.keys(subs).length)vals[sessionalCat.id]=dsuSessionalTotalFromValues(subs);
+          const special=parsed.special;
+          const built=dsuBuildResult(student.id,cid,vals,cfg,special,subs,old);
+          const idxOld=dsuFindResultIndex(student.id,cid);
+          if(idxOld>=0)examResults[idxOld]=built.result;else examResults.push(built.result);
+          updated++;
+        }catch(rowErr){errors.push(`Row ${idx+2}: ${rowErr.message}`);skipped++;}
+      });
+      saveToStorage();
+      if(typeof refreshAll==='function')refreshAll();
+      if(currentUser?.role==='teacher'&&typeof renderTeacherCourseResults==='function')renderTeacherCourseResults(cid);
+      if(document.getElementById('at-results')&&(isAdminUser()||isProgramManager())&&typeof renderExamResultsManager==='function')renderExamResultsManager(cid);
+      const statusEl=document.getElementById('examResultUploadStatus');
+      let msg=`✓ Excel result upload completed for <strong>${escHtml(cid)}</strong>: <strong>${updated}</strong> row(s) imported/updated.`;
+      if(skipped)msg+=` <strong>${skipped}</strong> row(s) skipped.`;
+      if(errors.length)msg+=`<br><span style="color:#f5c060;">${errors.slice(0,8).map(escHtml).join('<br>')}${errors.length>8?'<br>…':''}</span>`;
+      if(statusEl)statusEl.innerHTML=`<div style="padding:10px 14px;border-radius:8px;border:1px solid rgba(126,203,184,.3);background:rgba(58,122,106,.12);color:#7ecbb8;font-size:13px;">${msg}</div>`;
+      toast(`Excel results imported: ${updated} row(s) for ${cid}.`,errors.length?'warn':'ok');
+    }catch(err){
+      console.error(err);const statusEl=document.getElementById('examResultUploadStatus');
+      if(statusEl)statusEl.innerHTML=`<div style="color:#e87c6e;font-size:12px;">❌ Could not read the result workbook: ${escHtml(err.message||String(err))}</div>`;
+      toast('Could not read the uploaded result workbook. Please check the StudentID and marks columns.','err');
+    }finally{input.value='';}
+  };
+  reader.onerror=()=>{toast('The browser could not read this Excel file. Try saving it as .xlsx and upload again.','err');input.value='';};
+  reader.readAsArrayBuffer(file);
+}
+
+function dsuSpecialSelectHtml(sid,cid,r){
+  const selected=dsuSpecialStatus(r);
+  return `<select class="result-special-select" id="special_${escHtml(sid)}_${escHtml(cid)}" onchange="dsuSpecialStatusChanged('${escHtml(sid)}','${escHtml(cid)}')">${dsuStatusOptions(selected)}</select>`;
+}
+function dsuSessionalEditorHtml(sid,cid,r){
+  const vals=dsuSessionalValues(r);
+  return `<div class="sessional-breakdown">${DSU_SESSIONAL_SUBMARKS.map(([k,label,max])=>`<div class="sb-item"><label>${label} /${max}</label><input type="number" min="0" max="${max}" step="0.5" data-sid="${escHtml(sid)}" data-cid="${escHtml(cid)}" data-sub="${k}" value="${vals[k]??''}" oninput="dsuLiveSessional('${escHtml(sid)}','${escHtml(cid)}')"></div>`).join('')}</div><div id="dsu_sess_total_${escHtml(sid)}_${escHtml(cid)}" style="font-size:10px;color:var(--amber3);margin-top:4px;font-weight:700;">Sessional Total: ${dsuSessionalTotalFromValues(vals)}/40</div>`;
+}
+function dsuReadSessionalInputs(sid,cid){
+  const vals={};DSU_SESSIONAL_SUBMARKS.forEach(([k])=>{const el=document.querySelector(`input[data-sid="${CSS.escape(String(sid))}"][data-cid="${CSS.escape(String(cid))}"][data-sub="${CSS.escape(k)}"]`);if(el&&el.value!=='')vals[k]=Number(el.value);});return vals;
+}
+function dsuLiveSessional(sid,cid){
+  const vals=dsuReadSessionalInputs(sid,cid);const total=dsuSessionalTotalFromValues(vals);const el=document.getElementById(`dsu_sess_total_${sid}_${cid}`);if(el)el.textContent=`Sessional Total: ${total}/40`;
+}
+function dsuSpecialStatusChanged(sid,cid){
+  const sel=document.getElementById(`special_${sid}_${cid}`);const sp=String(sel?.value||'');
+  document.querySelectorAll(`input[data-sid="${CSS.escape(String(sid))}"][data-cid="${CSS.escape(String(cid))}"][data-sub]`).forEach(el=>el.disabled=!!sp);
+}
+function dsuCollectFlexible(sid,cid,selector){
+  const cfg=assessmentConfigForCourse(cid),vals={};
+  for(const cat of cfg.categories){
+    if(_isSessionalCat(cat.name)||String(cat.id).toLowerCase()==='sessional'){
+      const subs=dsuReadSessionalInputs(sid,cid);
+      if(Object.keys(subs).length)vals[cat.id]=dsuSessionalTotalFromValues(subs);
+      continue;
+    }
+    const el=document.querySelector(`${selector}[data-sid="${CSS.escape(String(sid))}"][data-cid="${CSS.escape(String(cid))}"][data-cat="${CSS.escape(String(cat.id))}"]`);
+    const raw=el?.value;if(raw===''||raw===undefined||raw===null)continue;const n=Number(raw);
+    if(!Number.isFinite(n)||n<0||n>Number(cat.max))throw new Error(`${cat.name} must be between 0 and ${cat.max}.`);
+    vals[cat.id]=Math.round(n*10)/10;
+  }
+  const special=document.getElementById(`special_${sid}_${cid}`)?.value||'';
+  return {cfg,vals,special,subs:dsuReadSessionalInputs(sid,cid)};
+}
+function dsuSaveFlexibleResult(sid,cid,selector){
+  if(!canEditCourseResults(cid))return;
+  try{
+    const {cfg,vals,special,subs}=dsuCollectFlexible(sid,cid,selector);
+    if(!Object.keys(vals).length&&!special){toast('Enter at least one mark or select I / W / F-SAT.','warn');return;}
+    if(!special&&Object.keys(subs).length&&!dsuHasCompleteSessionalSubmarks(subs)){toast('Please enter all four Sessional sub-marks (Quiz, Assignment, Presentation and Participation).','warn');return;}
+    const old=latestExamResult(sid,cid);if(old?.approved){toast('This result is already officially approved and cannot be overwritten here.','err');return;}
+    const built=dsuBuildResult(sid,cid,vals,cfg,special,subs,old);
+    const idx=dsuFindResultIndex(sid,cid);if(idx>=0)examResults[idx]=built.result;else examResults.push(built.result);
+    saveToStorage();if(typeof refreshAll==='function')refreshAll(sid);
+    if(selector==='.teacher-exam-input')renderTeacherCourseResults(cid);else renderExamResultsManager(cid);
+    toast(built.complete?`${cid} — ${built.result.grade} submitted for ${sid}.`:`${cid} marks saved for ${sid}.`,built.complete?'warn':'ok');
+  }catch(e){toast(e.message||'Could not save result.','warn');}
+}
+
+// Admin/Program Manager result-entry table with detailed Sessional sub-marks.
+function renderExamResultCourse(cid){
+  if(!cid||!canEditCourseResults(cid))return;const cfg=assessmentConfigForCourse(cid),c=courses.find(x=>_ncid(x.id)===_ncid(cid)),host=document.getElementById('examResultCourseTable');if(!host)return;
+  let rows=[...new Set(activeEnrollmentsFor(cid).map(e=>String(e.studentId)))].map(id=>students.find(s=>String(s.id)===id)).filter(Boolean);
+  const q=String(document.getElementById('resultStudentNumber')?.value||'').trim().toLowerCase();if(q){const m=new Set(matchResultStudents(q).map(s=>String(s.id)));if(m.size)rows=rows.filter(s=>m.has(String(s.id)));}
+  const sessionalExists=cfg.categories.some(cat=>_isSessionalCat(cat.name)||String(cat.id).toLowerCase()==='sessional');
+  host.innerHTML=rows.length?`<div class="sec-hdr"><div><div class="sec-title" style="font-size:18px">${escHtml(c?.title||cid)} <span class="code-badge">${escHtml(cid)}</span></div><div class="sec-sub">${c?.credits||0} credit hour(s) · ${rows.length} student(s) enrolled</div></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:240px"><input id="examRosterSearch" placeholder="Search student in this course…" oninput="filterExamRosterRows('examRosterSearch','examResultCourseTable')"><button type="button" class="btn btn-dark btn-xs" onclick="downloadResultsTemplate('${escHtml(cid)}')">⇩ Download Excel Template</button><label class="btn btn-sage btn-xs" style="cursor:pointer;">⇧ Upload Marks (.xlsx)<input type="file" accept=".xlsx,.xls,.csv" style="display:none;" onchange="importResultsExcel(this,'${escHtml(cid)}')"/></label></div></div><div class="alert alert-i" style="margin-bottom:12px;"><span class="alert-ico">ℹ</span><strong>Grading:</strong> A 86–100 · A− 80–85 · B+ 76–79 · B 72–75 · B− 68–71 · C+ 64–67 · C 60–63 · C− 57–59 · D+ 54–56 · D 50–53 · F &lt;50. Special results: <strong>I</strong> Incomplete, <strong>W</strong> Withdrawn, <strong>F-SAT</strong> Fail due to shortage of attendance.</div><div class="tbl-wrap" style="overflow-x:auto"><table style="min-width:${900+cfg.categories.length*105}px"><thead><tr><th>#</th><th>Student</th>${sessionalExists?'<th>Sessional Sub-Marks<br><span style="font-size:9px;">Quiz + Assignment + Presentation + Participation</span></th>':''}${cfg.categories.filter(cat=>!(_isSessionalCat(cat.name)||String(cat.id).toLowerCase()==='sessional')).map(cat=>`<th>${escHtml(cat.name)}<br><span style="font-size:10px">/${cat.max}</span></th>`).join('')}<th>Sessional Total</th><th>Total</th><th>Grade / Status</th><th>Save</th></tr></thead><tbody>${rows.map((s,i)=>{const r=latestExamResult(s.id,cid),sp=dsuSpecialStatus(r);return `<tr><td>${i+1}</td><td><strong>${escHtml((s.firstName||'')+' '+(s.lastName||''))}</strong><br><span class="code-badge">${escHtml(s.id)}</span></td>${sessionalExists?`<td>${dsuSessionalEditorHtml(s.id,cid,r)}</td>`:''}${cfg.categories.filter(cat=>!(_isSessionalCat(cat.name)||String(cat.id).toLowerCase()==='sessional')).map(cat=>`<td><input class="exam-mark-input" data-sid="${escHtml(s.id)}" data-cid="${escHtml(cid)}" data-cat="${escHtml(cat.id)}" type="number" min="0" max="${cat.max}" step="0.5" value="${resultComponentsFor(r,cfg)[cat.id]??''}" style="width:76px"></td>`).join('')}<td style="font-weight:700;color:var(--amber3);">${r?.sessional??'—'}</td><td id="flex_total_${escHtml(s.id)}_${escHtml(cid)}">${r?.total??'—'}</td><td>${dsuSpecialSelectHtml(s.id,cid,r)}<div style="margin-top:4px;font-size:10px;color:var(--tx3);">${sp?escHtml(dsuSpecialLabel(sp)):(r?.complete?escHtml(r.grade):'IN PROGRESS')}</div></td><td><button class="btn btn-amber btn-xs" onclick="dsuSaveFlexibleResult('${escHtml(s.id)}','${escHtml(cid)}','.exam-mark-input')">Save</button></td></tr>`;}).join('')}</tbody></table></div>`:'<div class="empty-state"><div class="empty-txt">No students are enrolled in this course.</div></div>';
+  rows.forEach(s=>dsuSpecialStatusChanged(s.id,cid));
+}
+
+// Faculty result-entry table with the same Sessional breakdown and special-grade controls.
+function renderTeacherCourseResults(cid){
+  if(!cid)return;if(!canEditCourseResults(cid)){toast('This course is not assigned to you.','err');return;}
+  const cfg=assessmentConfigForCourse(cid),c=courses.find(x=>String(x.id)===String(cid)),wrap=document.getElementById('teacherExamCourseWrap');if(!wrap)return;
+  const enrolled=enrollments.filter(e=>String(e.courseId)===String(cid)&&(e.status==='active'||e.status==='completed'));
+  const rows=[...new Set(enrolled.map(e=>String(e.studentId)))].map(id=>students.find(s=>String(s.id)===id)).filter(Boolean);
+  const sessionalExists=cfg.categories.some(cat=>_isSessionalCat(cat.name)||String(cat.id).toLowerCase()==='sessional');
+  wrap.innerHTML=`<div class="sec-hdr"><div><div class="sec-title">${escHtml(c?.title||cid)} <span class="code-badge">${escHtml(cid)}</span></div><div class="sec-sub">${c?.credits||0} credit hour(s) · ${rows.length} enrolled student(s). Faculty can enter or edit marks only for this assigned course.</div></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:240px"><input id="teacherExamSearch" placeholder="Search student in this course…" oninput="filterTeacherExamStudents()"><button type="button" class="btn btn-dark btn-xs" onclick="downloadResultsTemplate('${escHtml(cid)}')">⇩ Download Excel Template</button><label class="btn btn-sage btn-xs" style="cursor:pointer;">⇧ Upload Marks (.xlsx)<input type="file" accept=".xlsx,.xls,.csv" style="display:none;" onchange="importResultsExcel(this,'${escHtml(cid)}')"/></label></div></div><div class="alert alert-i" style="margin-bottom:12px;"><span class="alert-ico">ℹ</span><strong>Grading:</strong> A 86–100 · A− 80–85 · B+ 76–79 · B 72–75 · B− 68–71 · C+ 64–67 · C 60–63 · C− 57–59 · D+ 54–56 · D 50–53 · F &lt;50. You may also select I (Incomplete), W (Withdrawn), or F-SAT (Fail due to shortage of attendance).</div><div id="teacherAssessmentConfigEditor"></div><div class="tbl-wrap" style="overflow-x:auto"><table style="min-width:${900+cfg.categories.length*105}px"><thead><tr><th>#</th><th>Student</th>${sessionalExists?'<th>Sessional Sub-Marks<br><span style="font-size:9px;">Quiz + Assignment + Presentation + Participation</span></th>':''}${cfg.categories.filter(cat=>!(_isSessionalCat(cat.name)||String(cat.id).toLowerCase()==='sessional')).map(cat=>`<th>${escHtml(cat.name)}<br><span style="font-size:10px;color:var(--tx3);">/${cat.max}</span></th>`).join('')}<th>Sessional Total</th><th>Total</th><th>Grade / Status</th><th>Save</th></tr></thead><tbody>${rows.map((s,i)=>{const r=latestExamResult(s.id,cid),v=resultComponentsFor(r,cfg),sp=dsuSpecialStatus(r);return `<tr><td>${i+1}</td><td><strong>${escHtml(s.firstName+' '+s.lastName)}</strong><br><span class="code-badge">${escHtml(s.id)}</span></td>${sessionalExists?`<td>${dsuSessionalEditorHtml(s.id,cid,r)}</td>`:''}${cfg.categories.filter(cat=>!(_isSessionalCat(cat.name)||String(cat.id).toLowerCase()==='sessional')).map(cat=>`<td><input class="teacher-exam-input" data-sid="${escHtml(s.id)}" data-cid="${escHtml(cid)}" data-cat="${escHtml(cat.id)}" type="number" min="0" max="${cat.max}" step="0.5" value="${v[cat.id]??''}" style="width:76px"></td>`).join('')}<td style="font-weight:700;color:var(--amber3);">${r?.sessional??'—'}</td><td id="tf_total_${escHtml(s.id)}_${escHtml(cid)}">${r?.total??'—'}</td><td>${dsuSpecialSelectHtml(s.id,cid,r)}<div style="margin-top:4px;font-size:10px;color:var(--tx3);">${sp?escHtml(dsuSpecialLabel(sp)):(r?.complete?escHtml(r.grade):'IN PROGRESS')}</div></td><td><button class="btn btn-amber btn-xs" onclick="dsuSaveFlexibleResult('${escHtml(s.id)}','${escHtml(cid)}','.teacher-exam-input')">Save</button></td></tr>`;}).join('')}</tbody></table></div>`;
+  renderAssessmentConfigEditor(cid,'teacherAssessmentConfigEditor');filterTeacherExamStudents();rows.forEach(s=>dsuSpecialStatusChanged(s.id,cid));wrap.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// Detailed approval tables: every Sessional sub-mark plus all assessment components,
+// special grade/status, total and approval history are visible to HOD and Dean/Controller.
+function dsuDetailedApprovalParts(r,cid){
+  const cfg=assessmentConfigForCourse(cid),parts=[];
+  cfg.categories.forEach(cat=>{
+    if(_isSessionalCat(cat.name)||String(cat.id).toLowerCase()==='sessional'){DSU_SESSIONAL_SUBMARKS.forEach(([k,label,max])=>parts.push({name:label,max,marks:r?.sessionalSubmarks?.[k],sub:true}));}
+    parts.push({name:cat.name,max:cat.max,marks:resultComponentsFor(r,cfg)[cat.id],sub:false});
+  });return parts;
+}
+function dsuDetailedApprovalHead(cid,rows){return dsuDetailedApprovalParts(rows?.[0]||null,cid).map(p=>`<th style="text-align:center;${p.sub?'color:#f5c060;font-size:10px;':''}">${escHtml(p.name)}<br><span style="font-size:9px;color:var(--tx3);">/${p.max}</span></th>`).join('');}
+function dsuDetailedApprovalCells(r,cid,rows){
+  const shape=dsuDetailedApprovalParts(rows?.[0]||r,cid),mine=dsuDetailedApprovalParts(r,cid);
+  return shape.map((p,i)=>{const m=mine.find(x=>x.name===p.name);return `<td style="text-align:center;${p.sub?'color:#f5c060;':''}">${m?.marks??'—'}</td>`;}).join('');
+}
+function renderResultApprovalCourse(cid){
+  const wrap=document.getElementById('approvalCourseWrap');if(!wrap)return;const c=courses.find(x=>_ncid(x.id)===_ncid(cid)),rows=pendingHODResultsForCourse(cid);if(!rows.length){wrap.innerHTML='';return;}
+  wrap.innerHTML=`<div class="sec-hdr" style="margin-top:10px;"><div><div class="sec-title" style="font-size:18px;">${escHtml(c?.title||cid)} <span class="code-badge">${escHtml(cid)}</span></div><div class="sec-sub">Complete detailed results for all enrolled students. Sessional sub-marks are shown individually before HOD approval.</div></div><button type="button" class="btn btn-sage btn-sm" onclick="approveCourseResults('${escHtml(cid)}')">✓ HOD Approve All ${rows.length}</button></div><div class="tbl-wrap" style="overflow-x:auto;"><table><thead><tr><th>Student</th><th>ID</th>${dsuDetailedApprovalHead(cid,rows)}<th>Total</th><th>Grade</th><th>Status</th><th>Submitted By</th></tr></thead><tbody>${rows.map(r=>{const s=students.find(x=>String(x.id)===String(r.studentId)),sp=dsuSpecialStatus(r);return `<tr><td><strong>${escHtml(s?s.firstName+' '+s.lastName:r.studentId)}</strong></td><td><span class="code-badge">${escHtml(r.studentId)}</span></td>${dsuDetailedApprovalCells(r,cid,rows)}<td style="text-align:center;font-weight:700;">${r.total??'—'}</td><td style="text-align:center;font-weight:800;" class="grade-special">${escHtml(r.grade||'—')}</td><td>${sp?escHtml(dsuSpecialLabel(sp)):escHtml(String(r.status||'').toUpperCase())}</td><td style="font-size:11px;color:var(--tx3);">${escHtml(r.postedBy?.name||r.postedBy||'—')}</td></tr>`;}).join('')}</tbody></table></div>`;
+}
+function renderWorkflowCourse(hostId,cid,title,approveLabel){
+  const wrap=document.getElementById(hostId+'-course-wrap');if(!wrap)return;const rows=hostId==='at-dean-approvals'?pendingDeanResultsForCourse(cid):pendingControllerResultsForCourse(cid),c=courses.find(x=>_ncid(x.id)===_ncid(cid));if(!rows.length){wrap.innerHTML='';return;}
+  const fn=hostId==='at-dean-approvals'?'approveDeanCourseResults':'approveControllerCourseResults';
+  wrap.innerHTML=`<div class="sec-hdr"><div><div class="sec-title" style="font-size:18px;">${escHtml(c?.title||cid)} <span class="code-badge">${escHtml(cid)}</span></div><div class="sec-sub">Detailed result sheet — Sessional sub-marks, all assessment components, totals and special grades are visible at this approval stage.</div></div><button class="btn btn-sage btn-sm" onclick="${fn}('${escHtml(cid)}')">✓ ${approveLabel} All ${rows.length}</button></div><div class="tbl-wrap" style="overflow-x:auto;"><table><thead><tr><th>Student</th><th>ID</th>${dsuDetailedApprovalHead(cid,rows)}<th>Total</th><th>Grade</th><th>Result Status</th><th>HOD</th><th>Dean</th></tr></thead><tbody>${rows.map(r=>{const s=students.find(x=>String(x.id)===String(r.studentId)),sp=dsuSpecialStatus(r);return `<tr><td><strong>${escHtml(s?s.firstName+' '+s.lastName:r.studentId)}</strong></td><td><span class="code-badge">${escHtml(r.studentId)}</span></td>${dsuDetailedApprovalCells(r,cid,rows)}<td><strong>${r.total??'—'}</strong></td><td><strong class="grade-special">${escHtml(r.grade||'—')}</strong></td><td>${sp?escHtml(dsuSpecialLabel(sp)):escHtml(String(r.status||'').toUpperCase())}</td><td style="color:#7ecbb8;">✓ Approved</td><td style="color:${r.deanApproved?'#7ecbb8':'#e0a339'};">${r.deanApproved?'✓ Approved':'Pending'}</td></tr>`;}).join('')}</tbody></table></div>`;
+}
+
+// Make Excel templates explicitly include the four Sessional sub-marks and special grade.
+function downloadResultsTemplate(cid){
+  if(!cid){toast('Choose a course first.','warn');return;}if(!canEditCourseResults(cid)){toast('This course is not assigned to you.','err');return;}
+  const rows=resultsRosterFor(cid);if(!rows.length){toast('No students are enrolled in this course yet.','warn');return;}
+  const cfg=assessmentConfigForCourse(cid),sessionalExists=cfg.categories.some(c=>_isSessionalCat(c.name)||String(c.id).toLowerCase()==='sessional');
+  const headers=['CourseID','StudentID','StudentName',...(sessionalExists?DSU_SESSIONAL_SUBMARKS.map(x=>x[1]+' /'+x[2]):[]),...cfg.categories.filter(c=>!(_isSessionalCat(c.name)||String(c.id).toLowerCase()==='sessional')).map(c=>c.name), 'Grade / Status','Remarks'];
+  const data=rows.map(s=>{const r=latestExamResult(s.id,cid),v=resultComponentsFor(r,cfg);const row={CourseID:cid,StudentID:s.id,StudentName:`${s.firstName||''} ${s.lastName||''}`.trim()};if(sessionalExists)DSU_SESSIONAL_SUBMARKS.forEach(([k,l])=>row[l+' /'+DSU_SESSIONAL_SUBMARKS.find(x=>x[0]===k)[2]]=r?.sessionalSubmarks?.[k]??'');cfg.categories.filter(c=>!(_isSessionalCat(c.name)||String(c.id).toLowerCase()==='sessional')).forEach(c=>row[c.name]=v[c.id]??'');row['Grade / Status']=r?.specialGrade||'';row.Remarks=r?.specialReason||'';return row;});
+  downloadXLSX(headers,data,`Results_Template_${cid}_${new Date().toLocaleDateString().replace(/\\//g,'-')}.xlsx`);toast(`Detailed result template downloaded for ${cid}. Include all four Sessional sub-marks; they automatically total /40.`,'ok');
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// REPORTS: Result Submission Report (Faculty tab + Admin tab),
+// Faculty Review Report (Admin), Exam Result Report (Admin).
+// ══════════════════════════════════════════════════════════════════════════════
+const REPORT_STAGE_COLORS={'Not Started':'var(--tx3)','Partial Submission':'#e0a339','Awaiting HOD':'#e0a339','Awaiting Dean':'#7db8e0','Awaiting Controller':'#c478f5','Controller Approved (Final)':'#7ecbb8'};
+function courseSubmissionStats(cid){
+  const ids=activeResultStudentIds(cid),total=ids.length;
+  let sessional=0,midterm=0,final=0,complete=0;const rows=[];
+  ids.forEach(sid=>{
+    const r=latestExamResult(sid,cid);
+    if(r){
+      if(r.sessional!==undefined&&r.sessional!==null)sessional++;
+      if(r.midterm!==undefined&&r.midterm!==null)midterm++;
+      if(r.final!==undefined&&r.final!==null)final++;
+      if(r.complete)complete++;
+      rows.push(r);
+    }
+  });
+  const pending=total-complete,pct=total?Math.round(complete/total*100):0;
+  let stage='Not Started';
+  if(total>0){
+    if(complete===total&&complete>0){
+      const hod=rows.every(r=>r.hodApproved),dn=rows.every(r=>r.deanApproved),ctrl=rows.every(r=>r.controllerApproved);
+      stage=ctrl?'Controller Approved (Final)':(dn?'Awaiting Controller':(hod?'Awaiting Dean':'Awaiting HOD'));
+    }else if(rows.length){
+      stage='Partial Submission';
+    }
+  }
+  return {total,sessional,midterm,final,complete,pending,pct,stage};
+}
+function reportCourseFacultyName(cid){
+  const os=(academicOffering||[]).filter(o=>offeringCourseCode(o)===_ncid(cid));
+  return [...new Set(os.map(o=>String(o.faculty||'').trim()).filter(Boolean))].join(', ')||'—';
+}
+function reportProgramFilterOptionsHTML(selectId,current){
+  return `<option value="">— All Programs —</option>${(getResultEntryPrograms()||[]).map(p=>`<option value="${escHtml(p)}" ${current===p?'selected':''}>${escHtml(p)}</option>`).join('')}`;
+}
+
+/* ---- Result Submission Report ---- */
+function submissionReportRowsHTML(ids,showFaculty){
+  return ids.map(cid=>{
+    const c=courses.find(x=>_ncid(x.id)===_ncid(cid)),st=courseSubmissionStats(cid),color=REPORT_STAGE_COLORS[st.stage]||'var(--tx3)';
+    return `<tr><td><span class="code-badge">${escHtml(cid)}</span></td><td>${escHtml(c?.title||cid)}</td>${showFaculty?`<td style="font-size:11px;">${escHtml(reportCourseFacultyName(cid))}</td>`:''}<td style="text-align:center;">${st.total}</td><td style="text-align:center;">${st.sessional}</td><td style="text-align:center;">${st.midterm}</td><td style="text-align:center;">${st.final}</td><td style="text-align:center;font-weight:700;color:${st.pct===100?'#7ecbb8':'var(--tx)'};">${st.complete}/${st.total} (${st.pct}%)</td><td><span style="font-size:11px;font-weight:700;color:${color};">${escHtml(st.stage)}</span></td></tr>`;
+  }).join('');
+}
+function renderSubmissionReport(){
+  const host=document.getElementById('at-submission-report');if(!host)return;
+  const sp=document.getElementById('subRepProgramFilter')?.value||'';
+  const ids=getResultEntryCourseIds(sp,'');
+  host.innerHTML=`<div class="sec-hdr"><div><div class="sec-title">📊 Result Submission Report</div><div class="sec-sub">Tracks how far faculty have progressed entering Sessional, Midterm and Final marks for every offered course, and where each course currently sits in the HOD → Dean → Controller of Examination approval chain.</div></div></div>
+  <div class="form-shell" style="margin-bottom:16px;"><div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end;">
+    <div class="fg" style="min-width:220px;"><label>Program</label><select id="subRepProgramFilter" onchange="renderSubmissionReport()">${reportProgramFilterOptionsHTML('subRepProgramFilter',sp)}</select></div>
+    <button type="button" class="btn btn-dark btn-sm" onclick="downloadSubmissionReport()">⬇ Export Excel</button>
+  </div></div>
+  <div class="tbl-wrap" style="overflow-x:auto;"><table><thead><tr><th>Code</th><th>Course</th><th>Faculty</th><th>Enrolled</th><th>Sessional</th><th>Midterm</th><th>Final</th><th>Complete</th><th>Stage</th></tr></thead><tbody>${ids.length?submissionReportRowsHTML(ids,true):'<tr><td colspan="9" style="text-align:center;color:var(--tx3);padding:24px;">No courses offered in the active session.</td></tr>'}</tbody></table></div>`;
+}
+function downloadSubmissionReport(){
+  const sp=document.getElementById('subRepProgramFilter')?.value||'';
+  const ids=getResultEntryCourseIds(sp,'');
+  const headers=['Course Code','Course Title','Faculty','Enrolled','Sessional Entered','Midterm Entered','Final Entered','Complete','Pending','% Complete','Approval Stage'];
+  const rows=ids.map(cid=>{const c=courses.find(x=>_ncid(x.id)===_ncid(cid)),st=courseSubmissionStats(cid);return {'Course Code':cid,'Course Title':c?.title||cid,'Faculty':reportCourseFacultyName(cid),'Enrolled':st.total,'Sessional Entered':st.sessional,'Midterm Entered':st.midterm,'Final Entered':st.final,'Complete':st.complete,'Pending':st.pending,'% Complete':st.pct,'Approval Stage':st.stage};});
+  downloadXLSX(headers,rows,`Result_Submission_Report_${new Date().toLocaleDateString().replace(/\//g,'-')}.xlsx`);
+  toast('Result submission report exported.','ok');
+}
+
+/* ---- Faculty (teacher-tab) version of the submission report ---- */
+function renderTeacherSubmissionReport(){
+  const el=document.getElementById('page-teacher-report');if(!el)return;
+  if(!currentUser||currentUser.role!=='teacher'){el.innerHTML='';return;}
+  const ids=getResultEntryCourseIds('','');
+  el.innerHTML=`<div class="page-inner"><div class="sec-hdr"><div><div class="sec-title">📊 My Result Submission Report</div><div class="sec-sub">Shows how complete your Sessional / Midterm / Final mark entry is for each course you teach in the active academic session, and where each course currently sits in the HOD → Dean → Controller of Examination approval chain.</div></div>
+    <button type="button" class="btn btn-dark btn-sm" onclick="downloadTeacherSubmissionReport()">⬇ Export Excel</button></div>
+    <div class="tbl-wrap" style="overflow-x:auto;"><table><thead><tr><th>Code</th><th>Course</th><th>Enrolled</th><th>Sessional</th><th>Midterm</th><th>Final</th><th>Complete</th><th>Stage</th></tr></thead><tbody>${ids.length?submissionReportRowsHTML(ids,false):'<tr><td colspan="8" style="text-align:center;color:var(--tx3);padding:24px;">No courses assigned/offered this session.</td></tr>'}</tbody></table></div></div>`;
+}
+function downloadTeacherSubmissionReport(){
+  const ids=getResultEntryCourseIds('','');
+  const headers=['Course Code','Course Title','Enrolled','Sessional Entered','Midterm Entered','Final Entered','Complete','Pending','% Complete','Approval Stage'];
+  const rows=ids.map(cid=>{const c=courses.find(x=>_ncid(x.id)===_ncid(cid)),st=courseSubmissionStats(cid);return {'Course Code':cid,'Course Title':c?.title||cid,'Enrolled':st.total,'Sessional Entered':st.sessional,'Midterm Entered':st.midterm,'Final Entered':st.final,'Complete':st.complete,'Pending':st.pending,'% Complete':st.pct,'Approval Stage':st.stage};});
+  downloadXLSX(headers,rows,`My_Submission_Report_${new Date().toLocaleDateString().replace(/\//g,'-')}.xlsx`);
+  toast('Submission report exported.','ok');
+}
+
+/* ---- Faculty Review Report (Admin): full HOD → Dean → Controller funnel ---- */
+const REPORT_STAGE_ORDER=['Not Started','Partial Submission','Awaiting HOD','Awaiting Dean','Awaiting Controller','Controller Approved (Final)'];
+function facultyReviewReportRows(ids){
+  const fmt=d=>d?new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}):'—';
+  return ids.map(cid=>{
+    const c=courses.find(x=>_ncid(x.id)===_ncid(cid)),st=courseSubmissionStats(cid);
+    const rrows=activeResultStudentIds(cid).map(sid=>latestExamResult(sid,cid)).filter(Boolean);
+    const hodDate=rrows.find(r=>r.hodApprovedAt)?.hodApprovedAt,deanDate=rrows.find(r=>r.deanApprovedAt)?.deanApprovedAt,ctrlDate=rrows.find(r=>r.controllerApprovedAt)?.controllerApprovedAt;
+    return {cid,title:c?.title||cid,faculty:reportCourseFacultyName(cid),stage:st.stage,hodDate,deanDate,ctrlDate,fmt};
+  });
+}
+function renderFacultyReviewReport(){
+  const host=document.getElementById('at-faculty-review-report');if(!host)return;
+  const sp=document.getElementById('frrProgramFilter')?.value||'';
+  const ids=getResultEntryCourseIds(sp,'');
+  const counts={};REPORT_STAGE_ORDER.forEach(s=>counts[s]=0);
+  const data=facultyReviewReportRows(ids);
+  data.forEach(d=>counts[d.stage]=(counts[d.stage]||0)+1);
+  const rowsHtml=data.map(d=>{
+    const color=REPORT_STAGE_COLORS[d.stage]||'var(--tx3)';
+    return `<tr><td><span class="code-badge">${escHtml(d.cid)}</span></td><td>${escHtml(d.title)}</td><td style="font-size:11px;">${escHtml(d.faculty)}</td><td><span style="font-size:11px;font-weight:700;color:${color};">${escHtml(d.stage)}</span></td><td style="text-align:center;font-size:11px;">${d.fmt(d.hodDate)}</td><td style="text-align:center;font-size:11px;">${d.fmt(d.deanDate)}</td><td style="text-align:center;font-size:11px;">${d.fmt(d.ctrlDate)}</td></tr>`;
+  }).join('');
+  host.innerHTML=`<div class="sec-hdr"><div><div class="sec-title">🔍 Faculty Review Report</div><div class="sec-sub">Consolidated view of every offered course's position in the review chain — from faculty submission through HOD, Dean and Controller of Examination approval.</div></div></div>
+  <div class="form-shell" style="margin-bottom:16px;"><div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end;">
+    <div class="fg" style="min-width:220px;"><label>Program</label><select id="frrProgramFilter" onchange="renderFacultyReviewReport()">${reportProgramFilterOptionsHTML('frrProgramFilter',sp)}</select></div>
+    <button type="button" class="btn btn-dark btn-sm" onclick="downloadFacultyReviewReport()">⬇ Export Excel</button>
+  </div></div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">${REPORT_STAGE_ORDER.map(s=>`<span class="stat-pill pill-ice">${escHtml(s)}: <strong>${counts[s]||0}</strong></span>`).join('')}</div>
+  <div class="tbl-wrap" style="overflow-x:auto;"><table><thead><tr><th>Code</th><th>Course</th><th>Faculty</th><th>Stage</th><th>HOD Approved</th><th>Dean Approved</th><th>Controller Approved</th></tr></thead><tbody>${rowsHtml||'<tr><td colspan="7" style="text-align:center;color:var(--tx3);padding:24px;">No courses offered in the active session.</td></tr>'}</tbody></table></div>`;
+}
+function downloadFacultyReviewReport(){
+  const sp=document.getElementById('frrProgramFilter')?.value||'';
+  const ids=getResultEntryCourseIds(sp,'');
+  const headers=['Course Code','Course Title','Faculty','Stage','HOD Approved At','Dean Approved At','Controller Approved At'];
+  const rows=facultyReviewReportRows(ids).map(d=>({'Course Code':d.cid,'Course Title':d.title,'Faculty':d.faculty,'Stage':d.stage,'HOD Approved At':d.hodDate||'','Dean Approved At':d.deanDate||'','Controller Approved At':d.ctrlDate||''}));
+  downloadXLSX(headers,rows,`Faculty_Review_Report_${new Date().toLocaleDateString().replace(/\//g,'-')}.xlsx`);
+  toast('Faculty review report exported.','ok');
+}
+
+/* ---- Exam Result Report (Admin): official Controller-approved results only ---- */
+function examResultReportRows(sp,ss){
+  const ids=getResultEntryCourseIds(sp,ss);
+  let rows=[];
+  ids.forEach(cid=>{activeResultStudentIds(cid).forEach(sid=>{const r=latestExamResult(sid,cid);if(r&&r.approved)rows.push(r);});});
+  if(ss){const matched=new Set(matchResultStudents(ss).map(s=>String(s.id)));rows=rows.filter(r=>matched.has(String(r.studentId)));}
+  return rows;
+}
+function renderExamResultReport(){
+  const host=document.getElementById('at-exam-result-report');if(!host)return;
+  const sp=document.getElementById('errProgramFilter')?.value||'',ss=document.getElementById('errStudentSearch')?.value||'';
+  const allRows=examResultReportRows(sp,ss);
+  const gd=gradeDistributionFor(allRows);
+  const gradeChips=GRADE_SCALE.map(g=>gd.dist[g.grade]?`<span class="stat-pill pill-ice" style="margin:2px;">${g.grade}: <strong>${gd.dist[g.grade]}</strong></span>`:'').join('');
+  const rowsHtml=allRows.map(r=>{
+    const s=students.find(x=>String(x.id)===String(r.studentId)),c=courses.find(x=>_ncid(x.id)===_ncid(r.courseId)),isF=r.gp<1;
+    return `<tr><td><strong>${escHtml(s?s.firstName+' '+s.lastName:r.studentId)}</strong></td><td><span class="code-badge">${escHtml(r.studentId)}</span></td><td>${escHtml(c?.title||r.courseId)} <span class="code-badge">${escHtml(r.courseId)}</span></td><td style="text-align:center;">${r.total??'—'}</td><td style="text-align:center;font-weight:800;color:${isF?'#e87c6e':'#7ecbb8'};">${escHtml(r.grade||'—')}</td><td style="text-align:center;">${escHtml(String(r.status||'').toUpperCase())}</td><td style="font-size:11px;color:var(--tx3);">${r.approvedAt?new Date(r.approvedAt).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'—'}</td></tr>`;
+  }).join('');
+  host.innerHTML=`<div class="sec-hdr"><div><div class="sec-title">🏁 Exam Result Report</div><div class="sec-sub">Official, Controller of Examination-approved final grades only — the posted results students see on their transcript.</div></div></div>
+  <div class="form-shell" style="margin-bottom:16px;"><div style="display:grid;grid-template-columns:repeat(3,minmax(200px,1fr));gap:12px;align-items:end;">
+    <div class="fg"><label>Program</label><select id="errProgramFilter" onchange="renderExamResultReport()">${reportProgramFilterOptionsHTML('errProgramFilter',sp)}</select></div>
+    <div class="fg"><label>Search Student</label><input id="errStudentSearch" value="${escHtml(ss)}" placeholder="Search by name or ID…" onkeydown="if(event.key==='Enter')renderExamResultReport()"></div>
+    <button type="button" class="btn btn-dark btn-sm" onclick="downloadExamResultReport()">⬇ Export Excel</button>
+  </div></div>
+  <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px;">${gradeChips}<span class="stat-pill pill-sage">PASS: <strong>${gd.pass}</strong></span><span class="stat-pill" style="margin:2px;background:rgba(192,57,43,.12);color:#e87c6e;">FAIL: <strong>${gd.fail}</strong></span><span class="stat-pill pill-ice">TOTAL: <strong>${gd.total}</strong></span></div>
+  <div class="tbl-wrap" style="overflow-x:auto;"><table><thead><tr><th>Student</th><th>ID</th><th>Course</th><th>Total</th><th>Grade</th><th>Status</th><th>Posted On</th></tr></thead><tbody>${rowsHtml||'<tr><td colspan="7" style="text-align:center;color:var(--tx3);padding:24px;">No officially posted (Controller-approved) results yet.</td></tr>'}</tbody></table></div>`;
+}
+function downloadExamResultReport(){
+  const sp=document.getElementById('errProgramFilter')?.value||'',ss=document.getElementById('errStudentSearch')?.value||'';
+  const allRows=examResultReportRows(sp,ss);
+  const headers=['Student Name','Student ID','Course Code','Course Title','Total','Grade','Status','Posted On'];
+  const rows=allRows.map(r=>{const s=students.find(x=>String(x.id)===String(r.studentId)),c=courses.find(x=>_ncid(x.id)===_ncid(r.courseId));return {'Student Name':s?s.firstName+' '+s.lastName:'','Student ID':r.studentId,'Course Code':r.courseId,'Course Title':c?.title||'','Total':r.total??'','Grade':r.grade||'','Status':String(r.status||'').toUpperCase(),'Posted On':r.approvedAt?new Date(r.approvedAt).toLocaleDateString('en-GB'):''};});
+  downloadXLSX(headers,rows,`Exam_Result_Report_${new Date().toLocaleDateString().replace(/\//g,'-')}.xlsx`);
+  toast('Exam result report exported.','ok');
+}
+
+/* ---- Faculty (teacher-tab) versions of the Review Report & Exam Result Report ----
+   Both reuse the same admin row-builders; getResultEntryCourseIds() already scopes
+   courses to the logged-in teacher's own assignments, so no extra filtering needed. */
+function renderTeacherFacultyReviewReport(){
+  const el=document.getElementById('page-teacher-review-report');if(!el)return;
+  if(!currentUser||currentUser.role!=='teacher'){el.innerHTML='';return;}
+  const ids=getResultEntryCourseIds('','');
+  const counts={};REPORT_STAGE_ORDER.forEach(s=>counts[s]=0);
+  const data=facultyReviewReportRows(ids);
+  data.forEach(d=>counts[d.stage]=(counts[d.stage]||0)+1);
+  const rowsHtml=data.map(d=>{
+    const color=REPORT_STAGE_COLORS[d.stage]||'var(--tx3)';
+    return `<tr><td><span class="code-badge">${escHtml(d.cid)}</span></td><td>${escHtml(d.title)}</td><td><span style="font-size:11px;font-weight:700;color:${color};">${escHtml(d.stage)}</span></td><td style="text-align:center;font-size:11px;">${d.fmt(d.hodDate)}</td><td style="text-align:center;font-size:11px;">${d.fmt(d.deanDate)}</td><td style="text-align:center;font-size:11px;">${d.fmt(d.ctrlDate)}</td></tr>`;
+  }).join('');
+  el.innerHTML=`<div class="page-inner"><div class="sec-hdr"><div><div class="sec-title">🔍 Review Status</div><div class="sec-sub">Where each of your courses currently sits in the HOD → Dean → Controller of Examination approval chain.</div></div>
+    <button type="button" class="btn btn-dark btn-sm" onclick="downloadTeacherFacultyReviewReport()">⬇ Export Excel</button></div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">${REPORT_STAGE_ORDER.map(s=>`<span class="stat-pill pill-ice">${escHtml(s)}: <strong>${counts[s]||0}</strong></span>`).join('')}</div>
+    <div class="tbl-wrap" style="overflow-x:auto;"><table><thead><tr><th>Code</th><th>Course</th><th>Stage</th><th>HOD Approved</th><th>Dean Approved</th><th>Controller Approved</th></tr></thead><tbody>${rowsHtml||'<tr><td colspan="6" style="text-align:center;color:var(--tx3);padding:24px;">No courses assigned/offered this session.</td></tr>'}</tbody></table></div></div>`;
+}
+function downloadTeacherFacultyReviewReport(){
+  const ids=getResultEntryCourseIds('','');
+  const headers=['Course Code','Course Title','Stage','HOD Approved At','Dean Approved At','Controller Approved At'];
+  const rows=facultyReviewReportRows(ids).map(d=>({'Course Code':d.cid,'Course Title':d.title,'Stage':d.stage,'HOD Approved At':d.hodDate||'','Dean Approved At':d.deanDate||'','Controller Approved At':d.ctrlDate||''}));
+  downloadXLSX(headers,rows,`My_Review_Status_${new Date().toLocaleDateString().replace(/\//g,'-')}.xlsx`);
+  toast('Review status report exported.','ok');
+}
+function renderTeacherExamResultReport(){
+  const el=document.getElementById('page-teacher-exam-report');if(!el)return;
+  if(!currentUser||currentUser.role!=='teacher'){el.innerHTML='';return;}
+  const ss=document.getElementById('terrStudentSearch')?.value||'';
+  const allRows=examResultReportRows('',ss);
+  const gd=gradeDistributionFor(allRows);
+  const gradeChips=GRADE_SCALE.map(g=>gd.dist[g.grade]?`<span class="stat-pill pill-ice" style="margin:2px;">${g.grade}: <strong>${gd.dist[g.grade]}</strong></span>`:'').join('');
+  const rowsHtml=allRows.map(r=>{
+    const s=students.find(x=>String(x.id)===String(r.studentId)),c=courses.find(x=>_ncid(x.id)===_ncid(r.courseId)),isF=r.gp<1;
+    return `<tr><td><strong>${escHtml(s?s.firstName+' '+s.lastName:r.studentId)}</strong></td><td><span class="code-badge">${escHtml(r.studentId)}</span></td><td>${escHtml(c?.title||r.courseId)} <span class="code-badge">${escHtml(r.courseId)}</span></td><td style="text-align:center;">${r.total??'—'}</td><td style="text-align:center;font-weight:800;color:${isF?'#e87c6e':'#7ecbb8'};">${escHtml(r.grade||'—')}</td><td style="text-align:center;">${escHtml(String(r.status||'').toUpperCase())}</td><td style="font-size:11px;color:var(--tx3);">${r.approvedAt?new Date(r.approvedAt).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'—'}</td></tr>`;
+  }).join('');
+  el.innerHTML=`<div class="page-inner"><div class="sec-hdr"><div><div class="sec-title">🏁 Exam Result Report</div><div class="sec-sub">Official, Controller of Examination-approved final grades for your own courses only — the posted results students see on their transcript.</div></div></div>
+    <div class="form-shell" style="margin-bottom:16px;"><div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end;">
+      <div class="fg" style="min-width:220px;"><label>Search Student</label><input id="terrStudentSearch" value="${escHtml(ss)}" placeholder="Search by name or ID…" onkeydown="if(event.key==='Enter')renderTeacherExamResultReport()"></div>
+      <button type="button" class="btn btn-dark btn-sm" onclick="renderTeacherExamResultReport()">Search</button>
+      <button type="button" class="btn btn-sage btn-sm" onclick="downloadTeacherExamResultReport()">⬇ Export Excel</button>
+    </div></div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px;">${gradeChips}<span class="stat-pill pill-sage">PASS: <strong>${gd.pass}</strong></span><span class="stat-pill" style="margin:2px;background:rgba(192,57,43,.12);color:#e87c6e;">FAIL: <strong>${gd.fail}</strong></span><span class="stat-pill pill-ice">TOTAL: <strong>${gd.total}</strong></span></div>
+    <div class="tbl-wrap" style="overflow-x:auto;"><table><thead><tr><th>Student</th><th>ID</th><th>Course</th><th>Total</th><th>Grade</th><th>Status</th><th>Posted On</th></tr></thead><tbody>${rowsHtml||'<tr><td colspan="7" style="text-align:center;color:var(--tx3);padding:24px;">No officially posted (Controller-approved) results yet for your courses.</td></tr>'}</tbody></table></div></div>`;
+}
+function downloadTeacherExamResultReport(){
+  const ss=document.getElementById('terrStudentSearch')?.value||'';
+  const allRows=examResultReportRows('',ss);
+  const headers=['Student Name','Student ID','Course Code','Course Title','Total','Grade','Status','Posted On'];
+  const rows=allRows.map(r=>{const s=students.find(x=>String(x.id)===String(r.studentId)),c=courses.find(x=>_ncid(x.id)===_ncid(r.courseId));return {'Student Name':s?s.firstName+' '+s.lastName:'','Student ID':r.studentId,'Course Code':r.courseId,'Course Title':c?.title||'','Total':r.total??'','Grade':r.grade||'','Status':String(r.status||'').toUpperCase(),'Posted On':r.approvedAt?new Date(r.approvedAt).toLocaleDateString('en-GB'):''};});
+  downloadXLSX(headers,rows,`My_Exam_Result_Report_${new Date().toLocaleDateString().replace(/\//g,'-')}.xlsx`);
+  toast('Exam result report exported.','ok');
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Academic Offering — live "Result Status" column, updated the moment faculty
+// save marks (uses the same stage logic as the Submission Report).
+// ══════════════════════════════════════════════════════════════════════════════
+function offeringResultStatusCellHTML(o){
+  const cid=o.isElectiveSlot?(o.selectedElectiveCode||''):(o.courseCode||'');
+  if(!cid)return '<span style="font-size:10px;color:var(--tx3);">—</span>';
+  const st=courseSubmissionStats(cid);
+  if(!st.total)return '<span style="font-size:10px;color:var(--tx3);">No students yet</span>';
+  const color=REPORT_STAGE_COLORS[st.stage]||'var(--tx3)';
+  return `<span style="font-size:11px;font-weight:700;color:${color};white-space:nowrap;">${escHtml(st.stage)}</span><div style="font-size:10px;color:var(--tx3);margin-top:2px;">${st.complete}/${st.total} complete</div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Grade Distribution Report — every offered course with a live A/B/C/D/F
+// breakdown, updated the instant faculty save a complete result (does not
+// wait for HOD/Dean/Controller approval, since the ask is real-time visibility).
+// ══════════════════════════════════════════════════════════════════════════════
+function courseCompleteResults(cid){
+  return activeResultStudentIds(cid).map(sid=>latestExamResult(sid,cid)).filter(r=>r&&r.complete);
+}
+function gradeDistributionCardsHTML(ids,wrapId){
+  return ids.map(cid=>{
+    const c=courses.find(x=>_ncid(x.id)===_ncid(cid));
+    const results=courseCompleteResults(cid);
+    const gd=gradeDistributionFor(results);
+    const chips=GRADE_SCALE.map(g=>gd.dist[g.grade]?`<span class="stat-pill pill-ice" style="margin:2px;">${g.grade}: <strong>${gd.dist[g.grade]}</strong></span>`:'').join('');
+    return `<div class="c-card" style="margin-bottom:12px;"><div class="c-card-top"><div class="c-code">${escHtml(cid)} · ${results.length} result(s) submitted</div><div class="c-title">${escHtml(c?.title||cid)}</div><div class="c-dept">${escHtml(reportCourseFacultyName(cid))}</div></div><div class="c-body"><div style="display:flex;flex-wrap:wrap;gap:2px;">${chips||'<span style="font-size:11px;color:var(--tx3);">No complete results submitted yet.</span>'}${results.length?`<span class="stat-pill pill-sage" style="margin:2px;">PASS: <strong>${gd.pass}</strong></span><span class="stat-pill" style="margin:2px;background:rgba(192,57,43,.12);color:#e87c6e;">FAIL: <strong>${gd.fail}</strong></span>`:''}</div></div><div class="c-footer"><span></span><button class="btn btn-amber btn-xs" onclick="renderGradeDistributionCourse('${escHtml(cid)}','${wrapId}')">View Student Results</button></div></div>`;
+  }).join('');
+}
+function renderGradeDistributionCourse(cid,wrapId){
+  const wrap=document.getElementById(wrapId);if(!wrap)return;
+  const c=courses.find(x=>_ncid(x.id)===_ncid(cid));
+  const results=courseCompleteResults(cid);
+  if(!results.length){wrap.innerHTML='';return;}
+  wrap.innerHTML=`<div class="sec-hdr" style="margin-top:16px;"><div><div class="sec-title" style="font-size:18px;">${escHtml(c?.title||cid)} <span class="code-badge">${escHtml(cid)}</span></div><div class="sec-sub">${results.length} student result(s) currently submitted for this course.</div></div></div><div class="tbl-wrap" style="overflow-x:auto;"><table><thead><tr><th>Student</th><th>ID</th><th>Total</th><th>Grade</th><th>Status</th></tr></thead><tbody>${results.map(r=>{const s=students.find(x=>String(x.id)===String(r.studentId)),isF=r.gp<1;return `<tr><td><strong>${escHtml(s?s.firstName+' '+s.lastName:r.studentId)}</strong></td><td><span class="code-badge">${escHtml(r.studentId)}</span></td><td style="text-align:center;">${r.total}</td><td style="text-align:center;font-weight:800;color:${isF?'#e87c6e':'#7ecbb8'};">${escHtml(r.grade)}</td><td style="text-align:center;">${escHtml(String(r.status||'').toUpperCase())}</td></tr>`;}).join('')}</tbody></table></div>`;
+}
+function gradeDistributionExportRows(ids){
+  const gradeKeys=GRADE_SCALE.map(g=>g.grade);
+  return ids.map(cid=>{
+    const c=courses.find(x=>_ncid(x.id)===_ncid(cid));
+    const results=courseCompleteResults(cid),gd=gradeDistributionFor(results);
+    const row={'Course Code':cid,'Course Title':c?.title||cid,'Faculty':reportCourseFacultyName(cid)};
+    gradeKeys.forEach(g=>row[g]=gd.dist[g]||0);
+    row['Pass']=gd.pass;row['Fail']=gd.fail;row['Total Submitted']=results.length;
+    return row;
+  });
+}
+function renderGradeDistributionReport(){
+  const host=document.getElementById('at-grade-distribution');if(!host)return;
+  const sp=document.getElementById('gdrProgramFilter')?.value||'';
+  const ids=getResultEntryCourseIds(sp,'');
+  host.innerHTML=`<div class="sec-hdr"><div><div class="sec-title">🎯 Grade Distribution Report</div><div class="sec-sub">Every offered course with a live grade breakdown — updates the moment faculty submit a complete result, without waiting for HOD/Dean/Controller approval.</div></div></div>
+  <div class="form-shell" style="margin-bottom:16px;"><div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end;">
+    <div class="fg" style="min-width:220px;"><label>Program</label><select id="gdrProgramFilter" onchange="renderGradeDistributionReport()">${reportProgramFilterOptionsHTML('gdrProgramFilter',sp)}</select></div>
+    <button type="button" class="btn btn-dark btn-sm" onclick="downloadGradeDistributionReport()">⬇ Export Excel</button>
+  </div></div>
+  <div class="cards-grid">${ids.length?gradeDistributionCardsHTML(ids,'gdrCourseWrap'):'<div class="empty-state"><div class="empty-ico">🎯</div><div class="empty-txt">No courses offered in the active session.</div></div>'}</div>
+  <div id="gdrCourseWrap"></div>`;
+}
+function downloadGradeDistributionReport(){
+  const sp=document.getElementById('gdrProgramFilter')?.value||'';
+  const ids=getResultEntryCourseIds(sp,'');
+  const gradeKeys=GRADE_SCALE.map(g=>g.grade);
+  const headers=['Course Code','Course Title','Faculty',...gradeKeys,'Pass','Fail','Total Submitted'];
+  downloadXLSX(headers,gradeDistributionExportRows(ids),`Grade_Distribution_Report_${new Date().toLocaleDateString().replace(/\//g,'-')}.xlsx`);
+  toast('Grade distribution report exported.','ok');
+}
+
+/* ---- Faculty (teacher-tab) version: same breakdown, scoped to their own courses ---- */
+function renderTeacherGradeDistributionReport(){
+  const el=document.getElementById('page-teacher-grade-report');if(!el)return;
+  if(!currentUser||currentUser.role!=='teacher'){el.innerHTML='';return;}
+  const ids=getResultEntryCourseIds('','');
+  el.innerHTML=`<div class="page-inner"><div class="sec-hdr"><div><div class="sec-title">🎯 Grade Distribution</div><div class="sec-sub">Live grade breakdown for your own courses — updates the moment you save a complete result, without waiting for HOD/Dean/Controller approval.</div></div>
+    <button type="button" class="btn btn-dark btn-sm" onclick="downloadTeacherGradeDistributionReport()">⬇ Export Excel</button></div>
+    <div class="cards-grid">${ids.length?gradeDistributionCardsHTML(ids,'tgdrCourseWrap'):'<div class="empty-state"><div class="empty-ico">🎯</div><div class="empty-txt">No courses assigned/offered this session.</div></div>'}</div>
+    <div id="tgdrCourseWrap"></div></div>`;
+}
+function downloadTeacherGradeDistributionReport(){
+  const ids=getResultEntryCourseIds('','');
+  const gradeKeys=GRADE_SCALE.map(g=>g.grade);
+  const headers=['Course Code','Course Title','Faculty',...gradeKeys,'Pass','Fail','Total Submitted'];
+  downloadXLSX(headers,gradeDistributionExportRows(ids),`My_Grade_Distribution_${new Date().toLocaleDateString().replace(/\//g,'-')}.xlsx`);
+  toast('Grade distribution report exported.','ok');
+}
+</script>\n</body>
 </html>
